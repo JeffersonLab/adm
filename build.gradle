@@ -5,6 +5,7 @@ plugins {
 description = 'Application deployment manager app'
 group 'org.jlab'
 version '1.0.0'
+ext.releaseDate = 'Mar 4 2024'
 
 tasks.withType(JavaCompile) {
     options.release = 11
@@ -39,6 +40,9 @@ war {
     filesMatching('WEB-INF/web.xml') {
         filter {
             String line -> line.replaceAll("@VERSION@", project.version)
+        }
+        filter {
+            String line -> line.replaceAll("@RELEASE_DATE@", releaseDate)
         }
     }
 }

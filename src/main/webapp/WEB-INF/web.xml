@@ -22,6 +22,10 @@
         <param-name>releaseNumber</param-name>
         <param-value>@VERSION@</param-value>
     </context-param>
+    <context-param>
+        <param-name>releaseDate</param-name>
+        <param-value>@RELEASE_DATE@</param-value>
+    </context-param>
     <filter>
         <filter-name>UrlRewriteFilter</filter-name>
         <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
