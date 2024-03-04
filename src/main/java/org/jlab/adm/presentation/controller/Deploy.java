@@ -1,4 +1,4 @@
-package org.jlab.deployer.presentation.controller;
+package org.jlab.adm.presentation.controller;
 
 import javax.json.Json;
 import javax.json.JsonObjectBuilder;
