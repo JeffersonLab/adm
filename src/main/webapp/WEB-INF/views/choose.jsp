@@ -13,7 +13,7 @@
     <jsp:body>
         <section>
             <h2 id="page-header-title"><c:out value="${title}"/></h2>
-            <form id="deploy-form" method="get" action="${pageContext.request.contextPath}/deploy">
+            <form id="deploy-form" method="post" action="${pageContext.request.contextPath}/deploy">
                 <label for="env">Environment</label>
                 <input id="env" type="text" name="env" value=""/>
                 <label for="app">Application</label>

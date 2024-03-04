@@ -26,6 +26,8 @@ public class Deploy extends HttpServlet {
         String app = request.getParameter("app");
         String version = request.getParameter("ver");
 
+        LOGGER.log(Level.INFO, "Requesting deploy of {0}, {1}, {2}", new Object[]{env, app, version});
+
         response.setContentType("application/json");
 
         JsonObjectBuilder json = Json.createObjectBuilder();

@@ -22,6 +22,9 @@ public class App implements Serializable {
     @Size(min = 1, max = 128)
     @Column(nullable = false, length = 128)
     private String name;
+    @Basic(optional = true)
+    @Column(name = "DOC_URL", nullable = true, length = 512)
+    private String docUrl;
 
     public BigDecimal getAppId() {
         return appId;
@@ -37,6 +40,14 @@ public class App implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDocUrl() {
+        return docUrl;
+    }
+
+    public void setDocUrl(String docUrl) {
+        this.docUrl = docUrl;
     }
 
     @Override
