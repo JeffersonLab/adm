@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
-@Table(schema = "ADM_OWNER")
+@Table(schema = "ADM_OWNER", name = "APP_ENV")
 public class AppEnv implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -29,7 +29,7 @@ public class AppEnv implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 128)
-    @Column(nullable = false, length = 128)
+    @Column(name = "SERVICE_USERNAME", nullable = false, length = 128)
     private String serviceUsername;
     @Basic(optional = false)
     @NotNull
@@ -39,7 +39,7 @@ public class AppEnv implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 128)
-    @Column(nullable = false, length = 128)
+    @Column(name = "DEPLOY_COMMAND", nullable = false, length = 128)
     private String deployCommand;
 
     public BigDecimal getEnvId() {
