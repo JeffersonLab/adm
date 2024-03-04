@@ -22,6 +22,10 @@ public class Deploy extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        String env = request.getParameter("env");
+        String app = request.getParameter("app");
+        String version = request.getParameter("ver");
+
         response.setContentType("application/json");
 
         JsonObjectBuilder json = Json.createObjectBuilder();

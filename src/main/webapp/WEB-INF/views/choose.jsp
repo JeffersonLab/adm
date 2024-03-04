@@ -14,9 +14,12 @@
         <section>
             <h2 id="page-header-title"><c:out value="${title}"/></h2>
             <form id="deploy-form" method="get" action="${pageContext.request.contextPath}/deploy">
-                <input type="text" name="env" value=""/>
-                <input type="text" name="app" value=""/>
-                <input type="text" name="ver" value=""/>
+                <label for="env">Environment</label>
+                <input id="env" type="text" name="env" value=""/>
+                <label for="app">Application</label>
+                <input id="app" type="text" name="app" value=""/>
+                <label for="ver">Version</label>
+                <input id="ver" type="text" name="ver" value=""/>
                 <button id="deploy-submit" type="submit">Deploy</button>
             </form>
         </section>
