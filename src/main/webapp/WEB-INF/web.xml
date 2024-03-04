@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="4.0" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+   http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd">
+    <welcome-file-list>
+        <welcome-file>choose</welcome-file>
+    </welcome-file-list>
+    <context-param>
+        <param-name>appName</param-name>
+        <param-value>Application Deployment Manager</param-value>
+    </context-param>
+    <context-param>
+        <param-name>appShortName</param-name>
+        <param-value>ADM</param-value>
+    </context-param>
+    <context-param>
+        <param-name>appSpecificEnvPrefix</param-name>
+        <param-value>ADM</param-value>
+    </context-param>
+    <context-param>
+        <param-name>releaseNumber</param-name>
+        <param-value>@VERSION@</param-value>
+    </context-param>
+    <filter>
+        <filter-name>UrlRewriteFilter</filter-name>
+        <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>UrlRewriteFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/error</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.Throwable</exception-type>
+        <location>/error</location>
+    </error-page>
+    <session-config>
+        <session-timeout>480</session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+            <secure>true</secure>
+        </cookie-config>
+        <tracking-mode>COOKIE</tracking-mode>
+    </session-config>
+    <security-constraint>
+        <display-name>Enforce Authenticated on SSO Redirect Page</display-name>
+        <web-resource-collection>
+            <web-resource-name>SSO Page</web-resource-name>
+            <url-pattern>/sso</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>**</role-name>
+        </auth-constraint>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+    <security-constraint>
+        <display-name>Enforce Admin on setup pages</display-name>
+        <web-resource-collection>
+            <web-resource-name>Setup Pages</web-resource-name>
+            <url-pattern>/setup/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>adm-admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <login-config>
+        <auth-method>OIDC</auth-method>
+    </login-config>
+    <security-role>
+        <role-name>adm-admin</role-name>
+    </security-role>
+    <distributable/>
+</web-app>

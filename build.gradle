@@ -1,0 +1,44 @@
+plugins {
+    id 'war'  
+}
+
+description = 'Application deployment manager app'
+group 'org.jlab'
+version '1.0.0'
+
+tasks.withType(JavaCompile) {
+    options.release = 11
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ["-Xlint:deprecation", "-Xlint:unchecked"]
+}
+
+repositories {
+    mavenCentral()
+
+    maven {
+        url "https://s01.oss.sonatype.org/content/repositories/releases/"
+    }
+}
+
+dependencies {
+    // No matter what smoothness weblib MUST be included in WAR (https://github.com/JeffersonLab/smoothness/issues/4)
+    implementation 'org.jlab:smoothness-weblib:4.5.0'
+
+    // Smoothness setup should install these into Wildfly
+    providedCompile 'org.tuckey:urlrewritefilter:4.0.4'
+
+    // Wildfly 26.1.3.Final provides:
+    providedCompile 'javax:javaee-api:8.0.1',
+                    'javax.servlet:jstl:1.2',
+                    'org.hibernate:hibernate-core:5.3.28.Final',
+                    'org.hibernate:hibernate-envers:5.3.28.Final'
+}
+
+war {
+    archiveFileName = 'adm.war'
+    filesMatching('WEB-INF/web.xml') {
+        filter {
+            String line -> line.replaceAll("@VERSION@", project.version)
+        }
+    }
+}
