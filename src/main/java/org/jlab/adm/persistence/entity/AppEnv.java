@@ -43,6 +43,10 @@ public class AppEnv implements Serializable {
     private String hostname;
     @Basic(optional = false)
     @NotNull
+    @Column(nullable = false)
+    private int port;
+    @Basic(optional = false)
+    @NotNull
     @Size(min = 1, max = 128)
     @Column(name = "DEPLOY_COMMAND", nullable = false, length = 128)
     private String deployCommand;
@@ -93,6 +97,14 @@ public class AppEnv implements Serializable {
 
     public void setHostname(String hostname) {
         this.hostname = hostname;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public String getDeployCommand() {

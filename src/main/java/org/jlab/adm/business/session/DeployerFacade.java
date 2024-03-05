@@ -41,13 +41,14 @@ public class DeployerFacade {
         String authorizedGroupname = appEnv.getAuthorizedGroupname();
         String serviceUsername = appEnv.getServiceUsername();
         String hostname = appEnv.getHostname();
+        int port = appEnv.getPort();
         String command = appEnv.getDeployCommand();
 
         if(!context.isCallerInRole(authorizedGroupname) && !context.isCallerInRole("adm-admin")) {
             throw new UserFriendlyException("User " + username + " is not authorized to deploy app " + app + " to env " + env);
         }
 
-        RemoteCommandResult result = sshFacade.executeRemoteCommand(serviceUsername, hostname, command);
+        RemoteCommandResult result = sshFacade.executeRemoteCommand(serviceUsername, hostname, port, command);
 
         return result;
     }

@@ -12,12 +12,11 @@ import java.time.Duration;
 
 @Stateless
 public class SSHFacade {
-    public RemoteCommandResult executeRemoteCommand(String username, String hostname, String command) throws IOException {
-        SshClient client = SshClient.setUpDefaultClient();
+    final Duration verifyTimeout = Duration.ofSeconds(5);
+    final Duration authTimeout = Duration.ofSeconds(5);
 
-        final int port = 22;
-        final Duration verifyTimeout = Duration.ofSeconds(5);
-        final Duration authTimeout = Duration.ofSeconds(5);
+    public RemoteCommandResult executeRemoteCommand(String username, String hostname, int port, String command) throws IOException {
+        SshClient client = SshClient.setUpDefaultClient();
 
         String out;
         String err;
