@@ -2,7 +2,7 @@ package org.jlab.adm.presentation.controller.setup;
 
 import org.jlab.adm.business.session.AbstractFacade;
 import org.jlab.adm.business.session.AppEnvFacade;
-import org.jlab.adm.org.jlab.adm.persistence.entity.AppEnv;
+import org.jlab.adm.persistence.entity.AppEnv;
 
 import javax.ejb.EJB;
 import javax.servlet.ServletException;

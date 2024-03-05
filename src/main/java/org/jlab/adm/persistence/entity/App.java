@@ -1,4 +1,4 @@
-package org.jlab.adm.org.jlab.adm.persistence.entity;
+package org.jlab.adm.persistence.entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;

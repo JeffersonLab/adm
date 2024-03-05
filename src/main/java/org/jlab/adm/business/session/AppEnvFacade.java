@@ -1,6 +1,6 @@
 package org.jlab.adm.business.session;
 
-import org.jlab.adm.org.jlab.adm.persistence.entity.AppEnv;
+import org.jlab.adm.persistence.entity.AppEnv;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
