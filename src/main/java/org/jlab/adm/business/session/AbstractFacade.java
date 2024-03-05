@@ -10,9 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractFacade<T> {
-    @Resource
-    protected SessionContext context;
-
     private final Class<T> entityClass;
 
     public AbstractFacade(Class<T> entityClass) {

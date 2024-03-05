@@ -1,5 +1,11 @@
 package org.jlab.adm.presentation.controller;
 
+import org.jlab.adm.business.session.DeployerFacade;
+import org.jlab.adm.persistence.model.RemoteCommandResult;
+import org.jlab.smoothness.business.exception.UserFriendlyException;
+
+import javax.annotation.security.PermitAll;
+import javax.ejb.EJB;
 import javax.json.Json;
 import javax.json.JsonObjectBuilder;
 import javax.servlet.ServletException;
@@ -18,19 +24,42 @@ public class Deploy extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(
             Deploy.class.getName());
 
+    @EJB
+    DeployerFacade deployerFacade;
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         String env = request.getParameter("env");
         String app = request.getParameter("app");
-        String version = request.getParameter("ver");
+        String ver = request.getParameter("ver");
 
-        LOGGER.log(Level.INFO, "Requesting deploy of {0}, {1}, {2}", new Object[]{env, app, version});
+        LOGGER.log(Level.INFO, "Requesting deploy of {0}, {1}, {2}", new Object[]{env, app, ver});
+
+        RemoteCommandResult result = null;
+        String exceptionMessage = null;
+
+        try {
+             result = deployerFacade.deploy(env, app, ver);
+        } catch (UserFriendlyException e) {
+            exceptionMessage = e.getMessage();
+        } catch(IOException e) {
+            // We print stack trace in this case because we don't know what exactly happened
+            e.printStackTrace();
+            exceptionMessage = e.getMessage();
+        }
 
         response.setContentType("application/json");
 
         JsonObjectBuilder json = Json.createObjectBuilder();
+
+        if(exceptionMessage != null) {
+            json.add("exception", exceptionMessage);
+        } else if(result != null) {
+            json.add("out", result.getOut());
+            json.add("err", result.getErr());
+        }
 
         String jsonStr = json.build().toString();
 

@@ -29,6 +29,11 @@ public class AppEnv implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 128)
+    @Column(name = "AUTHORIZED_GROUPNAME", nullable = false, length = 128)
+    private String authorizedGroupname;
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 128)
     @Column(name = "SERVICE_USERNAME", nullable = false, length = 128)
     private String serviceUsername;
     @Basic(optional = false)
@@ -64,6 +69,14 @@ public class AppEnv implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getAuthorizedGroupname() {
+        return authorizedGroupname;
+    }
+
+    public void setAuthorizedGroupname(String authorizedGroupname) {
+        this.authorizedGroupname = authorizedGroupname;
     }
 
     public String getServiceUsername() {

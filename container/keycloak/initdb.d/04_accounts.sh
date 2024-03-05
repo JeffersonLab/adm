@@ -29,11 +29,15 @@ KEYCLOAK_EMAIL=jsmith@example.com
 create_user
 assign_role
 
+KEYCLOAK_ROLE_NAME=deployer-group
+assign_role
+
 KEYCLOAK_USERNAME=tbrown
 KEYCLOAK_FIRSTNAME=Tom
 KEYCLOAK_LASTNAME=Brown
 KEYCLOAK_EMAIL=tbrown@example.com
 create_user
+KEYCLOAK_ROLE_NAME=${KEYCLOAK_RESOURCE}-user
 assign_role
 KEYCLOAK_ROLE_NAME=${KEYCLOAK_RESOURCE}-admin
 assign_role
