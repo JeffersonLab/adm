@@ -1,3 +1,15 @@
 #page-header-logo {
     background: url("../img/logo32x32.png") 0 0;
 }
+
+#deploy-form {
+    margin: 1em;
+}
+
+#result-message {
+    color: red;
+}
+
+#result-message.success {
+    color: green;
+}

@@ -22,6 +22,9 @@
                 <input id="ver" type="text" name="ver" value=""/>
                 <button id="deploy-submit" type="submit">Deploy</button>
             </form>
+            <div id="result-message"></div>
+            <div id="out"></div>
+            <div id="err"></div>
         </section>
     </jsp:body>
 </t:page>
