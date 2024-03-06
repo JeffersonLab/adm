@@ -1,17 +1,17 @@
 services:
   oracle:
     extends:
-      file: deps.yaml
+      file: compose.yaml
       service: oracle
 
   keycloak:
     extends:
-      file: deps.yaml
+      file: compose.yaml
       service: keycloak
 
   sshd:
     extends:
-      file: deps.yaml
+      file: compose.yaml
       service: sshd
 
   adm:
