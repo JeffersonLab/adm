@@ -48,6 +48,9 @@ public class DeployerFacade {
             throw new UserFriendlyException("User " + username + " is not authorized to deploy app " + app + " to env " + env);
         }
 
+        // The template expectation is to append version as last argument to the deploy command
+        command = command + " " + ver;
+
         RemoteCommandResult result = sshFacade.executeRemoteCommand(serviceUsername, hostname, port, command);
 
         return result;

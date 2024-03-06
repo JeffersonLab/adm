@@ -9,6 +9,8 @@ KEYCLOAK_ROLE_NAME=${KEYCLOAK_RESOURCE}-user
 create_role
 KEYCLOAK_ROLE_NAME=${KEYCLOAK_RESOURCE}-admin
 create_role
+KEYCLOAK_ROLE_NAME=deployer-group
+create_role
 
 echo "----------------"
 echo "| Create Users |"
