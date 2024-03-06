@@ -32,3 +32,14 @@ services:
       TZ: 'America/New_York'
     volumes:
       - ./container/keycloak/initdb.d:/container-entrypoint-initdb.d
+
+  sshd:
+    build:
+      context: .
+      dockerfile: Dockerfile-sshd
+    hostname: sshd
+    container_name: sshd
+    ports:
+      - "1234:22"
+    environment:
+      TEST_USER_AUTHORIZED_KEY: ${TEST_USER_AUTHORIZED_KEY}

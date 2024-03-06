@@ -1,0 +1,17 @@
+FROM alpine:3.19
+
+RUN apk update \
+    && apk add openssh shadow tini bash \
+    && useradd -m -s /bin/bash testuser \
+    && echo "testuser:password" | chpasswd \
+    && mkdir /home/testuser/.ssh \
+    && chown testuser:testuser /home/testuser/.ssh \
+    && chmod 0700 /home/testuser/.ssh \
+    && ssh-keygen -A \
+    && echo "LogLevel=DEBUG3" >> /etc/ssh/sshd_config
+
+EXPOSE 22
+
+COPY ./container/sshd/container-entrypoint.sh /
+
+ENTRYPOINT ["/sbin/tini", "--", "/container-entrypoint.sh"]
