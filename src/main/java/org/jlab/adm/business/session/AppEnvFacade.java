@@ -42,7 +42,7 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
 
         AppEnv result = null;
 
-        if(entityList != null) {
+        if(entityList != null && !entityList.isEmpty()) {
             result = entityList.get(0);
 
             // unique SQL constraint should enforce this
