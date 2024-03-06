@@ -1,0 +1,38 @@
+services:
+  oracle:
+    extends:
+      file: deps.yaml
+      service: oracle
+
+  keycloak:
+    extends:
+      file: deps.yaml
+      service: keycloak
+
+  sshd:
+    extends:
+      file: deps.yaml
+      service: sshd
+    environment:
+      TEST_USER_AUTHORIZED_KEY: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4s2lC5RHzhbpj+GkxcuOAZLr1ta0Ebo9P5zUhBEmDUiiRfXAwZc83MrEqFfgmGUNeY5vMnwdFpJsTiKs2nqAqJTyHy7GnN39e4JRFg3mLV8AV/S+o8/F1ez94jvfNaIH+6vW25uKfqSe/pVAqPVlEvs4x29zT5JcSyNt+0w+E0Jm4WQakvlU1IWgcUXIy4fsjd0g6CFX/z0WwJtMkjzJlyiJUHNBCNuSvMUC2khDpCYvft5lqTNwvaB809BRnuP2/ejhwK2JGGPe9snqXQnlfO4CrujguoJT8FqhbzqLKVj/YhvENUMQGT9pt2wtKglVLUf5R48eeivNpAWX7tTXH jboss@adm"
+
+  adm:
+    hostname: adm
+    container_name: adm
+    ports:
+      - "8443:8443"
+      - "8080:8080"
+      - "9990:9990"
+    environment:
+      ORACLE_DATASOURCE: 'adm'
+      ORACLE_SERVER: 'oracle:1521'
+      ORACLE_USER: 'ADM_OWNER'
+      ORACLE_PASS: 'password'
+      ORACLE_SERVICE: 'xepdb1'
+      FRONTEND_SERVER_URL: 'https://localhost:8443'
+      BACKEND_SERVER_URL: 'http://adm:8080'
+      TZ: 'America/New_York'
+    volumes:
+      # This is a demo/test key.
+      - ./container/app/test_rsa_key:/opt/jboss/.ssh/id_rsa
+      - ./container/app/test_rsa_key.pub:/opt/jboss/.ssh/id_rsa.pub

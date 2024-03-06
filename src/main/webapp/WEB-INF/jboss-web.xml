@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jboss-web>  
     <resource-ref>  
-        <res-ref-name>jdbc/dtm</res-ref-name>
-        <jndi-name>java:/jdbc/dtm</jndi-name>
+        <res-ref-name>jdbc/adm</res-ref-name>
+        <jndi-name>java:/jdbc/adm</jndi-name>
     </resource-ref>
     <resource-ref>  
         <res-ref-name>mail/jlab</res-ref-name>  

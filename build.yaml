@@ -1,0 +1,23 @@
+services:
+  oracle:
+    extends:
+      file: deps.yaml
+      service: oracle
+
+  keycloak:
+    extends:
+      file: deps.yaml
+      service: keycloak
+
+  sshd:
+    extends:
+      file: deps.yaml
+      service: sshd
+
+  adm:
+    extends:
+      file: compose.yaml
+      service: adm
+    build:
+      context: .
+      dockerfile: Dockerfile
