@@ -4,8 +4,8 @@ plugins {
 
 description = 'Application deployment manager app'
 group 'org.jlab'
-version '1.0.1'
-ext.releaseDate = 'Mar 7 2024'
+version new File("./VERSION").text
+ext.releaseDate = new Date().format('MMM dd yyyy')
 
 tasks.withType(JavaCompile) {
     options.release = 11
