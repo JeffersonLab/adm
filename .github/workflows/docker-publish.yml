@@ -4,6 +4,8 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Release"]
 
 jobs:
   push_to_registry:
