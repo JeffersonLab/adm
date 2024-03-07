@@ -35,7 +35,7 @@ docker compose up
 http://localhost:8080/adm
 ```
 
-**Note**: Login with demo username "tbrown" and password "password".
+**Note**: Login with demo username "tbrown" and password "password".   Use env "local-demo", app "testapp", ver "1.0.0".
 
 ## Install
 This application requires a Java 11+ JVM and standard library to run, plus a Java EE 8+ application server (developed with Wildfly).
@@ -90,6 +90,8 @@ FRONTEND_SERVER_URL=https://localhost:8443
 Further, the local DataSource must also leverage localhost port forwarding so the `standalone.xml` connection-url field should be: `jdbc:oracle:thin:@//localhost:1521/xepdb1`.
 
 The [server](https://github.com/JeffersonLab/wildfly/blob/main/scripts/server-setup.sh) and [app](https://github.com/JeffersonLab/wildfly/blob/main/scripts/app-setup.sh) setup scripts can be used to setup a local instance of Wildfly.
+
+The user you use to run Wildfly needs to have an SSH public/private key pair (ssh-keygen) in the default location (~/.ssh).   The public key needs to be added to the `authorized_keys` file of user `testuser` in the container named "sshd".  This can be done by creating a file named `.env` in the root of the project containing the env name "TEST_USER_AUTHORIZED_KEY" with value being Wildfly user's public key.  This env will then be passed in via deps.yaml environment setting.
 
 ## Release
 1. Bump the release date and version number in build.gradle and commit and push to GitHub (using [Semantic Versioning](https://semver.org/)).
