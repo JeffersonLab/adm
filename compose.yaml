@@ -14,6 +14,7 @@ services:
       file: deps.yaml
       service: sshd
     environment:
+      # Using the demo/test public key below
       TEST_USER_AUTHORIZED_KEY: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4s2lC5RHzhbpj+GkxcuOAZLr1ta0Ebo9P5zUhBEmDUiiRfXAwZc83MrEqFfgmGUNeY5vMnwdFpJsTiKs2nqAqJTyHy7GnN39e4JRFg3mLV8AV/S+o8/F1ez94jvfNaIH+6vW25uKfqSe/pVAqPVlEvs4x29zT5JcSyNt+0w+E0Jm4WQakvlU1IWgcUXIy4fsjd0g6CFX/z0WwJtMkjzJlyiJUHNBCNuSvMUC2khDpCYvft5lqTNwvaB809BRnuP2/ejhwK2JGGPe9snqXQnlfO4CrujguoJT8FqhbzqLKVj/YhvENUMQGT9pt2wtKglVLUf5R48eeivNpAWX7tTXH jboss@adm"
 
   adm:
@@ -32,7 +33,34 @@ services:
       FRONTEND_SERVER_URL: 'https://localhost:8443'
       BACKEND_SERVER_URL: 'http://adm:8080'
       TZ: 'America/New_York'
-    volumes:
-      # This is a demo/test key.
-      - ./container/app/test_rsa_key:/opt/jboss/.ssh/id_rsa
-      - ./container/app/test_rsa_key.pub:/opt/jboss/.ssh/id_rsa.pub
+      # This is demo/test public key
+      RSA_PUBLIC_KEY: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4s2lC5RHzhbpj+GkxcuOAZLr1ta0Ebo9P5zUhBEmDUiiRfXAwZc83MrEqFfgmGUNeY5vMnwdFpJsTiKs2nqAqJTyHy7GnN39e4JRFg3mLV8AV/S+o8/F1ez94jvfNaIH+6vW25uKfqSe/pVAqPVlEvs4x29zT5JcSyNt+0w+E0Jm4WQakvlU1IWgcUXIy4fsjd0g6CFX/z0WwJtMkjzJlyiJUHNBCNuSvMUC2khDpCYvft5lqTNwvaB809BRnuP2/ejhwK2JGGPe9snqXQnlfO4CrujguoJT8FqhbzqLKVj/YhvENUMQGT9pt2wtKglVLUf5R48eeivNpAWX7tTXH jboss@adm"
+      # This is demo/test private key
+      RSA_PRIVATE_KEY: |-
+        -----BEGIN RSA PRIVATE KEY-----
+        MIIEpAIBAAKCAQEAuLNpQuUR84W6Y/hpMXLjgGS69bWtBG6PT+c1IQRJg1IokX1w
+        MGXPNzKxKhX4JhlDXmObzJ8HRaSbE4irNp6gKiU8h8uxpzd/XuCURYN5i1fAFf0v
+        qPPxdXs/eI73zWiB/ur1tubin6knv6VQKj1ZRL7OMdvc0+SXEsjbftMPhNCZuFkG
+        pL5VNSFoHFFyMuH7I3dIOghV/89FsCbTJI8yZcoiVBzQQjbkrzFAtpIQ6QmL37eZ
+        akzcL2gfNPQUZ7j9v3o4cCtiRhj3vbJ6l0J5XzuAq7o4LqCU/BaoW86iylY/2Ibx
+        DVDEBk/abdsLSoJVS1H+UePHnorzaQFl+7U1xwIDAQABAoIBAEtRdjo+OWzJ+rEr
+        qpHsnNNNwGPUWyK0hyJ5UVQOcH/pr/tsYKSLz81dkZts7A11PeCu0+jEbO28azSz
+        Bca3Nu8Y0i86JE7hNcKV6EDUlWr6NK2C2r2WBL/4q3BZNLoBxQkT/XFBg+bBzyC6
+        pA8lh1KeUG1KkCmkTOrvF3sHTIvG5wl2wmecb//UJmeW5oXaBUczPz5Os8iHgMpt
+        1pHn7g0WjLioAdbn3746Ek46/TgjXeAPxyyjZTMiMv9bq2h8MUavdWl8hqJHyiDr
+        EzQ3qdMYJWZJIgPHMe7D2fJM0lOYUVdSMZJQYFWMV2gKMxqWyaJpFilgoMffjbo0
+        ILUq6LkCgYEA6+Or/kOlKYgnELa1qMjcxxyac/vGRInhe6J1uHblF7TfSjoMSOG6
+        dLqsspcJ+qEeEccpHQrkAbwKNLKbiWL/o/zGgSWliuxNQzIO+VzUmG1XUXk1mFa8
+        YrT9rRitEFFn484tdJCeWXMMo1G0QekNDwGWkRceILrdoBGN/oqIoMMCgYEAyHKK
+        YIM1+A06CjE6NqpgcUEDEHsCR8zk72cgFki3N+gxOSUo4jJYuG3i1iyCJMq+rPTg
+        wgvzlCA1FE6JN2bHajplDUrUdwGvAKTqdKN5a8kwtOXEAYzqCGYFU/td/aOF3zWy
+        /nDvMt+yZlJJVj4aVqqRww2qlu95qPYhC1Y0Bq0CgYEArSnvIrKp1jk65EwcQxFg
+        8VIQGEClpb7KJiZ24Ll3J9YBbM38IqyCYhp/mILEMpaAKnDXv5g1FQjjPRg4kbx5
+        CfsQBdKLGdaqST/AOlJpRpRN22Ntcq2JkbRn3OAWe7om19aNC9r2Q5fvmRzrhM7+
+        ZRu3Wj9sQH6tH0qDwG4WKl0CgYAo+akp44ijxWho7vk8dYWzgRu0QcEMlmjyO32G
+        sKSrjA6L5Pm/i5UxVl05dO3BwaRKzOApKrJHRHI1TXylU6BOKdPAbNyT20c/9XZs
+        E4Ldssn/ILz5qCmrP9e0/DyRfdz+7QZDFyj+mFXqrsWJGLbfooybd+64XgnbrTzC
+        CYQnHQKBgQCidyqxaSkO22xlx0pSuZxDc8tI7H2UnM//rQQLINdfI9+DGCJnBcNb
+        LfmolQrfWcw94tOHoBO6m0saMH4G+G1hGG3jigJOmL9Veg0+KRiIDHD+DmUvMw7z
+        ND3JFkgtnhxfjvT8fE1q657l3fnELklp6ZdwUx0u0NMjO6Bo25JLcA==
+        -----END RSA PRIVATE KEY-----

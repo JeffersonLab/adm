@@ -18,6 +18,7 @@ RUN cd /app && gradle build -x test --no-watch-fs $OPTIONAL_CERT_ARG
 ################## Stage 1
 FROM ${RUN_IMAGE} as runner
 COPY --from=builder /app/container/app/app-setup.env /
+COPY --from=builder /app/container/app/pre-entrypoint.sh /
 USER root
 RUN /server-setup.sh /app-setup.env wildfly_start_and_wait \
      && /app-setup.sh /app-setup.env config_keycloak_client \
@@ -29,6 +30,11 @@ RUN /server-setup.sh /app-setup.env wildfly_start_and_wait \
      && mkdir /opt/jboss/.ssh \
      && chown -R jboss:jboss /opt/jboss \
      && chmod 0700 /opt/jboss/.ssh \
-     && yum install openssh-clients -y
+     && yum install openssh-clients -y \
+     && cd /tmp \
+     && curl -O https://dlcdn.apache.org/mina/sshd/2.12.1/apache-sshd-2.12.1.tar.gz \
+     && tar -xvzf apache-sshd-2.12.1.tar.gz \
+     && chmod +x apache-sshd-2.12.1/bin/ssh.sh
 USER jboss
 COPY --from=builder /app/build/libs/* /opt/jboss/wildfly/standalone/deployments
+ENTRYPOINT /pre-entrypoint.sh
