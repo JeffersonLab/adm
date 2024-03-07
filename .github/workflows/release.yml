@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     paths:
-      - './VERSION'
+      - 'VERSION'
 
 jobs:
   release:
