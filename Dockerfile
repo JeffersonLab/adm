@@ -38,3 +38,6 @@ RUN /server-setup.sh /app-setup.env wildfly_start_and_wait \
 USER jboss
 COPY --from=builder /app/build/libs/* /opt/jboss/wildfly/standalone/deployments
 ENTRYPOINT /pre-entrypoint.sh
+
+FROM runner as dev
+USER root

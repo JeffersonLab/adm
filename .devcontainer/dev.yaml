@@ -15,6 +15,10 @@ services:
       service: sshd
 
   adm:
+    build:
+      context: ../.
+      dockerfile: Dockerfile
+      target: dev
     extends:
       file: ../compose.yaml
       service: adm

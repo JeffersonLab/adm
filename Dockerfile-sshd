@@ -1,6 +1,13 @@
 FROM alpine:3.19
 
-RUN apk update \
+ARG CUSTOM_CRT_URL=http://pki.jlab.org/JLabCA.crt
+
+RUN if [ -z "$CUSTOM_CRT_URL" ] ; then echo "No custom cert needed"; else \
+              mkdir -p /usr/local/share/ca-certificates \
+              && wget -O /usr/local/share/ca-certificates/customcert.crt $CUSTOM_CRT_URL \
+              && cat /usr/local/share/ca-certificates/customcert.crt >> /etc/ssl/certs/ca-certificates.crt \
+    ; fi \
+    && apk update \
     && apk add openssh shadow tini bash \
     && useradd -m -s /bin/bash testuser \
     && echo "testuser:password" | chpasswd \

@@ -21,3 +21,4 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: runner
