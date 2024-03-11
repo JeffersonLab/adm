@@ -5,10 +5,7 @@ on:
     types: [published]
   workflow_dispatch:
   workflow_run:
-    workflows: ["Release"]
-    types: [completed]
-    branches:
-      - "main"
+    branches: ['v*.*.*']
 
 jobs:
   push_to_registry:
