@@ -39,6 +39,6 @@ jobs:
   docker_publish:
     needs:
       - release
-    uses: ./docker-publish.yml@621984e2431292d79d7d2872ef0bc3e7aa6fe2a0
+    uses: jeffersonlab/adm/.github/workflows/docker-publish.yml@main
     with:
       semvertag: ${{ needs.release.outputs.semvertag }}
