@@ -1,0 +1,20 @@
+services:
+  oracle:
+    extends:
+      file: ../compose.yaml
+      service: oracle
+
+  keycloak:
+    extends:
+      file: ../compose.yaml
+      service: keycloak
+
+  sshd:
+    extends:
+      file: ../compose.yaml
+      service: sshd
+
+  adm:
+    extends:
+      file: ../compose.yaml
+      service: adm
