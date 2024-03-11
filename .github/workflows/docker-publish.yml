@@ -4,10 +4,11 @@ on:
   release:
     types: [published]
   workflow_dispatch:
-  workflow_run:
-    workflows: ["Release"]
-    types: [completed]
-    branches: ['v*.*.*']
+  workflow_call:
+    inputs:
+      semvertag:
+        required: true
+        type: string
 
 jobs:
   push_to_registry:
@@ -26,7 +27,7 @@ jobs:
             jeffersonlab/${{ github.event.repository.name }}
           tags: |
             type=semver,pattern={{version}}
-            type=semver,pattern={{version}},event=workflow_run,value=${{ github.event.workflow_run.head_branch }}
+            type=semver,pattern={{version}},event=workflow_run,value=${{ inputs.semvertag }}
 
       -
         name: Login to DockerHub
