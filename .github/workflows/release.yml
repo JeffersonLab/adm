@@ -27,14 +27,14 @@ jobs:
         id: getver
         run: |
           VER=$(cat VERSION)
-          echo "VERSION=$VER" >> $GITHUB_ENV
-          echo "semvertag=$VER" >> $GITHUB_OUTPUT
+          echo "VERSION=v$VER" >> $GITHUB_ENV
+          echo "semvertag=v$VER" >> $GITHUB_OUTPUT
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true
           files: build/libs/adm.war
-          tag_name: v${{ env.VERSION }}
+          tag_name: ${{ env.VERSION }}
 
   docker_publish:
     needs:
@@ -42,3 +42,4 @@ jobs:
     uses: jeffersonlab/adm/.github/workflows/docker-publish.yml@main
     with:
       semvertag: ${{ needs.release.outputs.semvertag }}
+    secrets: inherit
