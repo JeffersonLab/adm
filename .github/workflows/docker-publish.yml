@@ -53,6 +53,6 @@ jobs:
       -
         name: Update demo version
         run: | 
-          sed -i -E 's/[0-9]+(\.[0-9]+)*/${{ inputs.semvertag:1 }}/' compose.override.yaml
-          git commit -am "Bump demo compose version to ${{ inputs.semvertag:1 }}"
+          sed -i -E 's/[0-9]+(\.[0-9]+)*/${{ steps.meta.outputs.version }}/' compose.override.yaml
+          git commit -am "Bump demo compose version to ${{ steps.meta.outputs.version }}"
           git push
