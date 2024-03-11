@@ -94,10 +94,9 @@ The [server](https://github.com/JeffersonLab/wildfly/blob/main/scripts/server-se
 The user you use to run Wildfly needs to have an SSH public/private key pair (ssh-keygen) in the default location (~/.ssh).   The public key needs to be added to the `authorized_keys` file of user `testuser` in the container named "sshd".  This can be done by creating a file named `.env` in the root of the project containing the env name "TEST_USER_AUTHORIZED_KEY" with value being Wildfly user's public key.  This env will then be passed in via deps.yaml environment setting.
 
 ## Release
-1. Bump the release date and version number in build.gradle and commit and push to GitHub (using [Semantic Versioning](https://semver.org/)).
-2. Create a new release on the GitHub Releases page corresponding to the same version in the build.gradle.   The release should enumerate changes and link issues.   A war artifact can be attached to the release to facilitate easy install by users.
-3. [Publish to DockerHub](https://github.com/JeffersonLab/workmap/actions/adm/docker-publish.yml) GitHub Action should run automatically.
-4. Bump and commit quick start [image version](https://github.com/JeffersonLab/adm/blob/main/compose.override.yaml)
+1. Bump the version number in the VERSION file and commit and push to GitHub (using [Semantic Versioning](https://semver.org/)).
+2. [Publish a Release](https://github.com/JeffersonLab/workmap/actions/adm/release.yml) GitHub Action should run automatically to tag the source, create releaste notes summarizing any pull requests, and attach a war artifact.   Edit the release notes to add any missing details.
+3. [Publish to DockerHub](https://github.com/JeffersonLab/workmap/actions/adm/docker-publish.yml) GitHub Action should run automatically to create, tag, and publish a new demo Docker image, and bump the [compose.override.yaml](https://github.com/JeffersonLab/adm/blob/main/compose.override.yaml) to use the new image.
 
 ## Deploy
 At JLab this app is found at [ace.jlab.org/adm](https://ace.jlab.org/adm) and internally at [acctest.acc.jlab.org/adm](https://acctest.acc.jlab.org/adm).  However, those servers are proxies for `wildfly6.acc.jlab.org` and `wildflytest6.acc.jlab.org` respectively.   A [deploy script](https://github.com/JeffersonLab/wildfly/blob/main/scripts/deploy.sh) is provided to automate wget and deploy.  Example:
