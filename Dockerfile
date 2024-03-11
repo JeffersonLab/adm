@@ -40,5 +40,5 @@ COPY --from=builder /app/build/libs/* /opt/jboss/wildfly/standalone/deployments
 ENTRYPOINT /pre-entrypoint.sh
 
 FROM runner as dev
-RUN yum install git -y
 USER root
+RUN yum install git -y
