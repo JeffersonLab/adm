@@ -39,13 +39,13 @@ public class DeployerFacade {
             throw new UserFriendlyException("AppEnv not found for app " + app + " and env " + env);
         }
 
-        String authorizedGroupname = appEnv.getAuthorizedGroupname();
-        String serviceUsername = appEnv.getServiceUsername();
+        String requestServiceUsername = appEnv.getRequestServiceUsername();
+        String runServiceUsername = appEnv.getRunServiceUsername();
         String hostname = appEnv.getHostname();
         int port = appEnv.getPort();
         String command = appEnv.getDeployCommand();
 
-        if(!context.isCallerInRole(authorizedGroupname) && !context.isCallerInRole("adm-admin")) {
+        if(!username.equals(requestServiceUsername) && !context.isCallerInRole("adm-admin")) {
             throw new UserFriendlyException("User " + username + " is not authorized to deploy app " + app + " to env " + env);
         }
 
@@ -55,7 +55,7 @@ public class DeployerFacade {
         // The template expectation is to append version as last argument to the deploy command
         command = command + " " + ver;
 
-        RemoteCommandResult result = sshFacade.executeRemoteCommand(serviceUsername, hostname, port, command);
+        RemoteCommandResult result = sshFacade.executeRemoteCommand(runServiceUsername, hostname, port, command);
 
         return result;
     }

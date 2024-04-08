@@ -29,13 +29,13 @@ public class AppEnv implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 128)
-    @Column(name = "AUTHORIZED_GROUPNAME", nullable = false, length = 128)
-    private String authorizedGroupname;
+    @Column(name = "REQUEST_SERVICE_USERNAME", nullable = false, length = 128)
+    private String requestServiceUsername;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 128)
-    @Column(name = "SERVICE_USERNAME", nullable = false, length = 128)
-    private String serviceUsername;
+    @Column(name = "RUN_SERVICE_USERNAME", nullable = false, length = 128)
+    private String runServiceUsername;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 128)
@@ -75,20 +75,20 @@ public class AppEnv implements Serializable {
         this.name = name;
     }
 
-    public String getAuthorizedGroupname() {
-        return authorizedGroupname;
+    public String getRequestServiceUsername() {
+        return requestServiceUsername;
     }
 
-    public void setAuthorizedGroupname(String authorizedGroupname) {
-        this.authorizedGroupname = authorizedGroupname;
+    public void setRequestServiceUsername(String authorizedGroupname) {
+        this.requestServiceUsername = authorizedGroupname;
     }
 
-    public String getServiceUsername() {
-        return serviceUsername;
+    public String getRunServiceUsername() {
+        return runServiceUsername;
     }
 
-    public void setServiceUsername(String serviceUsername) {
-        this.serviceUsername = serviceUsername;
+    public void setRunServiceUsername(String serviceUsername) {
+        this.runServiceUsername = serviceUsername;
     }
 
     public String getHostname() {

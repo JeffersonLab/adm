@@ -18,7 +18,8 @@
                     <tr>
                         <th>App Name</th>
                         <th>Env Name</th>
-                        <th>Service Username</th>
+                        <th>Request Service Username</th>
+                        <th>Run Service Username</th>
                         <th>Hostname</th>
                         <th>Deploy Command</th>
                     </tr>
@@ -33,7 +34,10 @@
                                 <c:out value="${appenv.name}"/>
                             </td>
                             <td>
-                                <c:out value="${appenv.serviceUsername}"/>
+                                <c:out value="${appenv.requestServiceUsername}"/>
+                            </td>
+                            <td>
+                                <c:out value="${appenv.runServiceUsername}"/>
                             </td>
                             <td>
                                 <c:out value="${appenv.hostname}"/>
