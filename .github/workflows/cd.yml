@@ -19,3 +19,13 @@ jobs:
     with:
       semvertag: ${{ needs.release.outputs.semvertag }}
     secrets: inherit
+
+  acctest_deploy:
+    needs:
+      - release
+    uses: jeffersonlab/general-workflows/.github/workflows/jlab-deploy-app.yml@v1
+    with:
+      app: adm
+      env: acctest
+      ver: ${{ needs.release.outputs.semver }}
+    secrets: inherit
