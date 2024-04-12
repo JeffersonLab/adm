@@ -1,5 +1,5 @@
 # adm [![CI](https://github.com/JeffersonLab/adm/actions/workflows/ci.yml/badge.svg)](https://github.com/JeffersonLab/adm/actions/workflows/ci.yml) [![Docker](https://img.shields.io/docker/v/jeffersonlab/adm?sort=semver&label=DockerHub)](https://hub.docker.com/r/jeffersonlab/adm)
-A [Java EE 8](https://en.wikipedia.org/wiki/Jakarta_EE) web application for app deployment at Jefferson Lab.
+A [Java EE 8](https://en.wikipedia.org/wiki/Jakarta_EE) web application for app deployment at Jefferson Lab built with the [Smoothness](https://github.com/JeffersonLab/smoothness) web template.
 
 
 ![Screenshot](https://github.com/JeffersonLab/adm/raw/main/Screenshot.png?raw=true "Screenshot")
