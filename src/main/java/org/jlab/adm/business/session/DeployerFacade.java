@@ -1,71 +1,71 @@
 package org.jlab.adm.business.session;
 
-import org.jlab.adm.persistence.entity.AppEnv;
-import org.jlab.adm.persistence.model.RemoteCommandResult;
-import org.jlab.smoothness.business.exception.UserFriendlyException;
-
+import java.io.IOException;
+import java.util.regex.Pattern;
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
 import javax.ejb.EJB;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
-import java.io.IOException;
-import java.util.regex.Pattern;
+import org.jlab.adm.persistence.entity.AppEnv;
+import org.jlab.adm.persistence.model.RemoteCommandResult;
+import org.jlab.smoothness.business.exception.UserFriendlyException;
 
 @Stateless
 public class DeployerFacade {
 
-    @Resource
-    SessionContext context;
+  @Resource SessionContext context;
 
-    @EJB
-    SSHFacade sshFacade;
+  @EJB SSHFacade sshFacade;
 
-    @EJB
-    AppEnvFacade appEnvFacade;
+  @EJB AppEnvFacade appEnvFacade;
 
-    @PermitAll
-    public RemoteCommandResult deploy(String env, String app, String ver) throws UserFriendlyException, IOException {
+  @PermitAll
+  public RemoteCommandResult deploy(String env, String app, String ver)
+      throws UserFriendlyException, IOException {
 
-        String username = context.getCallerPrincipal().getName();
+    String username = context.getCallerPrincipal().getName();
 
-        if(username == null || username.isEmpty() || username.equalsIgnoreCase("ANONYMOUS")) {
-            throw new UserFriendlyException("You must authenticate before issuing a deploy command");
-        }
-
-        AppEnv appEnv = appEnvFacade.find(app, env);
-
-        if(appEnv == null) {
-            throw new UserFriendlyException("AppEnv not found for app " + app + " and env " + env);
-        }
-
-        String requestServiceUsername = appEnv.getRequestServiceUsername();
-        String runServiceUsername = appEnv.getRunServiceUsername();
-        String hostname = appEnv.getHostname();
-        int port = appEnv.getPort();
-        String command = appEnv.getDeployCommand();
-
-        if(!username.equals(requestServiceUsername) && !context.isCallerInRole("adm-admin")) {
-            throw new UserFriendlyException("User " + username + " is not authorized to deploy app " + app + " to env " + env);
-        }
-
-        // Ensure version string is semver, and therefore also unlikely a shell command
-        validateSemver(ver);
-
-        // The template expectation is to append version as last argument to the deploy command
-        command = command + " " + ver;
-
-        RemoteCommandResult result = sshFacade.executeRemoteCommand(runServiceUsername, hostname, port, command);
-
-        return result;
+    if (username == null || username.isEmpty() || username.equalsIgnoreCase("ANONYMOUS")) {
+      throw new UserFriendlyException("You must authenticate before issuing a deploy command");
     }
 
-    private void validateSemver(String ver) throws UserFriendlyException {
-        final String regex = "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$";
-        final Pattern p = Pattern.compile(regex);
+    AppEnv appEnv = appEnvFacade.find(app, env);
 
-        if(!p.matcher(ver).matches()) {
-            throw new UserFriendlyException("Version string must be semver formatted");
-        }
+    if (appEnv == null) {
+      throw new UserFriendlyException("AppEnv not found for app " + app + " and env " + env);
     }
+
+    String requestServiceUsername = appEnv.getRequestServiceUsername();
+    String runServiceUsername = appEnv.getRunServiceUsername();
+    String hostname = appEnv.getHostname();
+    int port = appEnv.getPort();
+    String command = appEnv.getDeployCommand();
+
+    if (!username.equals(requestServiceUsername) && !context.isCallerInRole("adm-admin")) {
+      throw new UserFriendlyException(
+          "User " + username + " is not authorized to deploy app " + app + " to env " + env);
+    }
+
+    // Ensure version string is semver, and therefore also unlikely a shell command
+    validateSemver(ver);
+
+    // The template expectation is to append version as last argument to the deploy command
+    command = command + " " + ver;
+
+    RemoteCommandResult result =
+        sshFacade.executeRemoteCommand(runServiceUsername, hostname, port, command);
+
+    return result;
+  }
+
+  private void validateSemver(String ver) throws UserFriendlyException {
+    final String regex =
+        "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$";
+    final Pattern p = Pattern.compile(regex);
+
+    if (!p.matcher(ver).matches()) {
+      throw new UserFriendlyException("Version string must be semver formatted");
+    }
+  }
 }

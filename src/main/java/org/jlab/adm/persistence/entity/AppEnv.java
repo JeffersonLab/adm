@@ -1,130 +1,137 @@
 package org.jlab.adm.persistence.entity;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Objects;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(schema = "ADM_OWNER", name = "APP_ENV")
 public class AppEnv implements Serializable {
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    @Id
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "ENV_ID", nullable = false, precision = 22, scale = 0)
-    private BigDecimal envId;
-    @NotNull
-    @JoinColumn(name = "APP_ID", referencedColumnName = "APP_ID", nullable = false)
-    @ManyToOne(optional = false)
-    private App app;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 128)
-    @Column(nullable = false, length = 128)
-    private String name;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 128)
-    @Column(name = "REQUEST_SERVICE_USERNAME", nullable = false, length = 128)
-    private String requestServiceUsername;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 128)
-    @Column(name = "RUN_SERVICE_USERNAME", nullable = false, length = 128)
-    private String runServiceUsername;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 128)
-    @Column(nullable = false, length = 128)
-    private String hostname;
-    @Basic(optional = false)
-    @NotNull
-    @Column(nullable = false)
-    private int port;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 128)
-    @Column(name = "DEPLOY_COMMAND", nullable = false, length = 128)
-    private String deployCommand;
+  @Id
+  @Basic(optional = false)
+  @NotNull
+  @Column(name = "ENV_ID", nullable = false, precision = 22, scale = 0)
+  private BigDecimal envId;
 
-    public BigDecimal getEnvId() {
-        return envId;
-    }
+  @NotNull
+  @JoinColumn(name = "APP_ID", referencedColumnName = "APP_ID", nullable = false)
+  @ManyToOne(optional = false)
+  private App app;
 
-    public void setEnvId(BigDecimal envId) {
-        this.envId = envId;
-    }
+  @Basic(optional = false)
+  @NotNull
+  @Size(min = 1, max = 128)
+  @Column(nullable = false, length = 128)
+  private String name;
 
-    public App getApp() {
-        return app;
-    }
+  @Basic(optional = false)
+  @NotNull
+  @Size(min = 1, max = 128)
+  @Column(name = "REQUEST_SERVICE_USERNAME", nullable = false, length = 128)
+  private String requestServiceUsername;
 
-    public void setApp(App app) {
-        this.app = app;
-    }
+  @Basic(optional = false)
+  @NotNull
+  @Size(min = 1, max = 128)
+  @Column(name = "RUN_SERVICE_USERNAME", nullable = false, length = 128)
+  private String runServiceUsername;
 
-    public String getName() {
-        return name;
-    }
+  @Basic(optional = false)
+  @NotNull
+  @Size(min = 1, max = 128)
+  @Column(nullable = false, length = 128)
+  private String hostname;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  @Basic(optional = false)
+  @NotNull
+  @Column(nullable = false)
+  private int port;
 
-    public String getRequestServiceUsername() {
-        return requestServiceUsername;
-    }
+  @Basic(optional = false)
+  @NotNull
+  @Size(min = 1, max = 128)
+  @Column(name = "DEPLOY_COMMAND", nullable = false, length = 128)
+  private String deployCommand;
 
-    public void setRequestServiceUsername(String authorizedGroupname) {
-        this.requestServiceUsername = authorizedGroupname;
-    }
+  public BigDecimal getEnvId() {
+    return envId;
+  }
 
-    public String getRunServiceUsername() {
-        return runServiceUsername;
-    }
+  public void setEnvId(BigDecimal envId) {
+    this.envId = envId;
+  }
 
-    public void setRunServiceUsername(String serviceUsername) {
-        this.runServiceUsername = serviceUsername;
-    }
+  public App getApp() {
+    return app;
+  }
 
-    public String getHostname() {
-        return hostname;
-    }
+  public void setApp(App app) {
+    this.app = app;
+  }
 
-    public void setHostname(String hostname) {
-        this.hostname = hostname;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public int getPort() {
-        return port;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public void setPort(int port) {
-        this.port = port;
-    }
+  public String getRequestServiceUsername() {
+    return requestServiceUsername;
+  }
 
-    public String getDeployCommand() {
-        return deployCommand;
-    }
+  public void setRequestServiceUsername(String authorizedGroupname) {
+    this.requestServiceUsername = authorizedGroupname;
+  }
 
-    public void setDeployCommand(String deployCommand) {
-        this.deployCommand = deployCommand;
-    }
+  public String getRunServiceUsername() {
+    return runServiceUsername;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof AppEnv)) return false;
-        AppEnv appEnv = (AppEnv) o;
-        return Objects.equals(app, appEnv.app) && Objects.equals(name, appEnv.name);
-    }
+  public void setRunServiceUsername(String serviceUsername) {
+    this.runServiceUsername = serviceUsername;
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(app, name);
-    }
+  public String getHostname() {
+    return hostname;
+  }
+
+  public void setHostname(String hostname) {
+    this.hostname = hostname;
+  }
+
+  public int getPort() {
+    return port;
+  }
+
+  public void setPort(int port) {
+    this.port = port;
+  }
+
+  public String getDeployCommand() {
+    return deployCommand;
+  }
+
+  public void setDeployCommand(String deployCommand) {
+    this.deployCommand = deployCommand;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof AppEnv)) return false;
+    AppEnv appEnv = (AppEnv) o;
+    return Objects.equals(app, appEnv.app) && Objects.equals(name, appEnv.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(app, name);
+  }
 }
