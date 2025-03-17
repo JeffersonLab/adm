@@ -1,8 +1,8 @@
 ARG BUILD_IMAGE=gradle:7.4-jdk17
-ARG RUN_IMAGE=jeffersonlab/wildfly:1.0.0
+ARG RUN_IMAGE=jeffersonlab/wildfly:1.6.2
 
 ################## Stage 0
-FROM ${BUILD_IMAGE} as builder
+FROM ${BUILD_IMAGE} AS builder
 ARG CUSTOM_CRT_URL
 USER root
 WORKDIR /
@@ -16,7 +16,7 @@ COPY . /app
 RUN cd /app && gradle build -x test --no-watch-fs $OPTIONAL_CERT_ARG
 
 ################## Stage 1
-FROM ${RUN_IMAGE} as runner
+FROM ${RUN_IMAGE} AS runner
 COPY --from=builder /app/container/app/app-setup.env /
 COPY --from=builder /app/container/app/pre-entrypoint.sh /
 USER root
@@ -39,6 +39,6 @@ USER jboss
 COPY --from=builder /app/build/libs/* /opt/jboss/wildfly/standalone/deployments
 ENTRYPOINT /pre-entrypoint.sh
 
-FROM runner as dev
+FROM runner AS dev
 USER root
 RUN yum install git -y
