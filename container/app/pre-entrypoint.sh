@@ -25,4 +25,4 @@ if [ -n "${RSA_PRIVATE_KEY}" ]; then
 fi
 
 # Now call the upstream jeffersonlab/wildfly entrypoint
-/docker-entrypoint.sh
+/container-entrypoint.sh
