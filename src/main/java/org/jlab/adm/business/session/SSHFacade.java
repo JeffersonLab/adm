@@ -2,15 +2,21 @@ package org.jlab.adm.business.session;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.security.PermitAll;
+import javax.ejb.Asynchronous;
 import javax.ejb.Stateless;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.session.ClientSession;
-import org.jlab.adm.persistence.model.RemoteCommandResult;
+import org.jlab.adm.persistence.entity.RemoteCommandResult;
 import org.jlab.adm.presentation.controller.Deploy;
+import org.jlab.smoothness.business.exception.UserFriendlyException;
 
 @Stateless
 public class SSHFacade {
@@ -20,14 +26,37 @@ public class SSHFacade {
   final Duration verifyTimeout = Duration.ofSeconds(5);
   final Duration authTimeout = Duration.ofSeconds(5);
 
-  public RemoteCommandResult executeRemoteCommand(
+  @Asynchronous
+  @PermitAll
+  public void asyncExecuteRemoteCommand(String username, String hostname, int port, String command)
+      throws UserFriendlyException {
+    RemoteCommandResult result = null;
+    Instant start = Instant.now();
+
+    try {
+      result = executeRemoteCommand(username, hostname, port, command);
+    } catch (Throwable t) {
+      StringWriter sw = new StringWriter();
+      PrintWriter pw = new PrintWriter(sw);
+      t.printStackTrace(pw);
+
+      result = new RemoteCommandResult(sw.toString());
+    }
+
+    result.setStart(start);
+    result.setEnd(Instant.now());
+  }
+
+  private RemoteCommandResult executeRemoteCommand(
       String username, String hostname, int port, String command) throws IOException {
     LOGGER.log(
         Level.INFO, "execute " + username + "@" + hostname + ":" + port + " \"" + command + "\"");
     SshClient client = SshClient.setUpDefaultClient();
 
+    int exitCode = 0;
     String out;
     String err;
+    String stackTrace = null;
 
     client.start();
 
@@ -47,7 +76,8 @@ public class SSHFacade {
     } // try with resources automatically calls session.close()
 
     client.stop();
+    client.close();
 
-    return new RemoteCommandResult(out, err);
+    return new RemoteCommandResult(exitCode, out, err);
   }
 }

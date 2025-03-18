@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jlab.adm.business.session.DeployerFacade;
-import org.jlab.adm.persistence.model.RemoteCommandResult;
+import org.jlab.adm.persistence.entity.RemoteCommandResult;
 import org.jlab.smoothness.business.exception.UserFriendlyException;
 
 @WebServlet(
@@ -39,7 +39,7 @@ public class Deploy extends HttpServlet {
     String exceptionMessage = null;
 
     try {
-      result = deployerFacade.deploy(env, app, ver);
+      deployerFacade.deploy(env, app, ver);
     } catch (UserFriendlyException e) {
       exceptionMessage = e.getMessage();
     } catch (IOException e) {
@@ -54,9 +54,6 @@ public class Deploy extends HttpServlet {
 
     if (exceptionMessage != null) {
       json.add("exception", exceptionMessage);
-    } else if (result != null) {
-      json.add("out", result.getOut());
-      json.add("err", result.getErr());
     }
 
     String jsonStr = json.build().toString();

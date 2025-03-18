@@ -8,7 +8,6 @@ import javax.ejb.EJB;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import org.jlab.adm.persistence.entity.AppEnv;
-import org.jlab.adm.persistence.model.RemoteCommandResult;
 import org.jlab.smoothness.business.exception.UserFriendlyException;
 
 @Stateless
@@ -21,8 +20,7 @@ public class DeployerFacade {
   @EJB AppEnvFacade appEnvFacade;
 
   @PermitAll
-  public RemoteCommandResult deploy(String env, String app, String ver)
-      throws UserFriendlyException, IOException {
+  public void deploy(String env, String app, String ver) throws UserFriendlyException, IOException {
 
     String username = context.getCallerPrincipal().getName();
 
@@ -53,10 +51,7 @@ public class DeployerFacade {
     // The template expectation is to append version as last argument to the deploy command
     command = command + " " + ver;
 
-    RemoteCommandResult result =
-        sshFacade.executeRemoteCommand(runServiceUsername, hostname, port, command);
-
-    return result;
+    sshFacade.asyncExecuteRemoteCommand(runServiceUsername, hostname, port, command);
   }
 
   private void validateSemver(String ver) throws UserFriendlyException {
