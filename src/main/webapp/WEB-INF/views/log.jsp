@@ -57,6 +57,7 @@
                 return false;
             });
             $(document).on("click", ".default-clear-panel", function () {
+                $("#job-id").val('');
                 $("#app-name").val('');
                 return false;
             });
@@ -79,6 +80,16 @@
                         <fieldset>
                             <legend>Filter</legend>
                             <ul class="key-value-list">
+                                <li>
+                                    <div class="li-key">
+                                        <label for="job-id">Job ID</label>
+                                    </div>
+                                    <div class="li-value">
+                                        <input id="job-id"
+                                               name="jobId" value="${fn:escapeXml(param.jobId)}"
+                                               />
+                                    </div>
+                                </li>
                                 <li>
                                     <div class="li-key">
                                         <label for="app-name">App Name</label>

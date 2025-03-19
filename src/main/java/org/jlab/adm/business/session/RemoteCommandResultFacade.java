@@ -26,8 +26,12 @@ public class RemoteCommandResultFacade extends AbstractFacade<RemoteCommandResul
   }
 
   private List<Predicate> getFilters(
-      CriteriaBuilder cb, Root<RemoteCommandResult> root, String appName) {
+      CriteriaBuilder cb, Root<RemoteCommandResult> root, BigInteger jobId, String appName) {
     List<Predicate> filters = new ArrayList<>();
+
+    if (jobId != null) {
+      filters.add(cb.equal(root.get("remoteCommandResultId"), jobId));
+    }
 
     if (appName != null && !appName.isEmpty()) {
       filters.add(
@@ -38,13 +42,14 @@ public class RemoteCommandResultFacade extends AbstractFacade<RemoteCommandResul
   }
 
   @PermitAll
-  public List<RemoteCommandResult> filterList(String appName, int offset, int max) {
+  public List<RemoteCommandResult> filterList(
+      BigInteger jobId, String appName, int offset, int max) {
     CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
     CriteriaQuery<RemoteCommandResult> cq = cb.createQuery(RemoteCommandResult.class);
     Root<RemoteCommandResult> root = cq.from(RemoteCommandResult.class);
     cq.select(root);
 
-    List<Predicate> filters = getFilters(cb, root, appName);
+    List<Predicate> filters = getFilters(cb, root, jobId, appName);
 
     if (!filters.isEmpty()) {
       cq.where(cb.and(filters.toArray(new Predicate[] {})));
@@ -63,12 +68,12 @@ public class RemoteCommandResultFacade extends AbstractFacade<RemoteCommandResul
   }
 
   @PermitAll
-  public long countList(String appName) {
+  public long countList(BigInteger jobId, String appName) {
     CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
     CriteriaQuery<Long> cq = cb.createQuery(Long.class);
     Root<RemoteCommandResult> root = cq.from(RemoteCommandResult.class);
 
-    List<Predicate> filters = getFilters(cb, root, appName);
+    List<Predicate> filters = getFilters(cb, root, jobId, appName);
 
     if (!filters.isEmpty()) {
       cq.where(cb.and(filters.toArray(new Predicate[] {})));
