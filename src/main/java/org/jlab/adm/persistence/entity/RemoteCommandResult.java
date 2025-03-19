@@ -2,7 +2,7 @@ package org.jlab.adm.persistence.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.util.Date;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
@@ -12,17 +12,43 @@ public class RemoteCommandResult implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @Id
+  @SequenceGenerator(
+      name = "remoteCommandResultId",
+      sequenceName = "REMOTE_COMMAND_RESULT_ID",
+      allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "remoteCommandResultId")
   @Basic(optional = false)
   @NotNull
   @Column(name = "REMOTE_COMMAND_RESULT_ID", nullable = false, precision = 22, scale = 0)
   private BigDecimal remoteCommandResultId;
 
+  @NotNull
+  @JoinColumn(name = "ENV_ID", referencedColumnName = "ENV_ID", nullable = false)
+  @ManyToOne(optional = false)
+  private AppEnv appEnv;
+
+  @Column(name = "STACK_TRACE", length = 4000)
   private String stackTrace;
+
+  @Column(name = "OUT", length = 4000)
   private String out;
+
+  @Column(name = "ERR", length = 4000)
   private String err;
+
+  @Column(name = "EXIT_CODE")
   private int exitCode;
-  private Instant start;
-  private Instant end;
+
+  // I'm aware using Date as local time with JPA doesn't handle DST, but doing it "correctly" is
+  // enormously
+  // complicated using legacy JPA APIs and this is "good enough".  Sorry double hour in the Fall.
+  @Column(name = "JOB_START")
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date start;
+
+  @Column(name = "JOB_END")
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date end;
 
   public RemoteCommandResult() {}
 
@@ -65,19 +91,19 @@ public class RemoteCommandResult implements Serializable {
     this.exitCode = exitCode;
   }
 
-  public Instant getStart() {
+  public Date getStart() {
     return start;
   }
 
-  public void setStart(Instant start) {
+  public void setStart(Date start) {
     this.start = start;
   }
 
-  public Instant getEnd() {
+  public Date getEnd() {
     return end;
   }
 
-  public void setEnd(Instant end) {
+  public void setEnd(Date end) {
     this.end = end;
   }
 
@@ -95,5 +121,13 @@ public class RemoteCommandResult implements Serializable {
 
   public String getStackTrace() {
     return stackTrace;
+  }
+
+  public AppEnv getAppEnv() {
+    return appEnv;
+  }
+
+  public void setAppEnv(AppEnv appEnv) {
+    this.appEnv = appEnv;
   }
 }

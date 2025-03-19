@@ -35,10 +35,6 @@ public class DeployerFacade {
     }
 
     String requestServiceUsername = appEnv.getRequestServiceUsername();
-    String runServiceUsername = appEnv.getRunServiceUsername();
-    String hostname = appEnv.getHostname();
-    int port = appEnv.getPort();
-    String command = appEnv.getDeployCommand();
 
     if (!username.equals(requestServiceUsername) && !context.isCallerInRole("adm-admin")) {
       throw new UserFriendlyException(
@@ -48,10 +44,7 @@ public class DeployerFacade {
     // Ensure version string is semver, and therefore also unlikely a shell command
     validateSemver(ver);
 
-    // The template expectation is to append version as last argument to the deploy command
-    command = command + " " + ver;
-
-    sshFacade.asyncExecuteRemoteCommand(runServiceUsername, hostname, port, command);
+    sshFacade.asyncExecuteRemoteCommand(appEnv, ver);
   }
 
   private void validateSemver(String ver) throws UserFriendlyException {

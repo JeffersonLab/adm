@@ -6,14 +6,16 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.time.Instant;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.security.PermitAll;
 import javax.ejb.Asynchronous;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.session.ClientSession;
+import org.jlab.adm.persistence.entity.AppEnv;
 import org.jlab.adm.persistence.entity.RemoteCommandResult;
 import org.jlab.adm.presentation.controller.Deploy;
 import org.jlab.smoothness.business.exception.UserFriendlyException;
@@ -26,15 +28,16 @@ public class SSHFacade {
   final Duration verifyTimeout = Duration.ofSeconds(5);
   final Duration authTimeout = Duration.ofSeconds(5);
 
+  @EJB RemoteCommandResultFacade remoteCommandResultFacade;
+
   @Asynchronous
   @PermitAll
-  public void asyncExecuteRemoteCommand(String username, String hostname, int port, String command)
-      throws UserFriendlyException {
+  public void asyncExecuteRemoteCommand(AppEnv env, String version) throws UserFriendlyException {
     RemoteCommandResult result = null;
-    Instant start = Instant.now();
+    Date start = new Date();
 
     try {
-      result = executeRemoteCommand(username, hostname, port, command);
+      result = executeRemoteCommand(env, version);
     } catch (Throwable t) {
       StringWriter sw = new StringWriter();
       PrintWriter pw = new PrintWriter(sw);
@@ -43,12 +46,23 @@ public class SSHFacade {
       result = new RemoteCommandResult(sw.toString());
     }
 
+    result.setAppEnv(env);
     result.setStart(start);
-    result.setEnd(Instant.now());
+    result.setEnd(new Date());
+
+    remoteCommandResultFacade.create(result);
   }
 
-  private RemoteCommandResult executeRemoteCommand(
-      String username, String hostname, int port, String command) throws IOException {
+  private RemoteCommandResult executeRemoteCommand(AppEnv env, String version) throws IOException {
+
+    String username = env.getRunServiceUsername();
+    String hostname = env.getHostname();
+    int port = env.getPort();
+    String command = env.getDeployCommand();
+
+    // The template expectation is to append version as last argument to the deploy command
+    command = command + " " + version;
+
     LOGGER.log(
         Level.INFO, "execute " + username + "@" + hostname + ":" + port + " \"" + command + "\"");
     SshClient client = SshClient.setUpDefaultClient();

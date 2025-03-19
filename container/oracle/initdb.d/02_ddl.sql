@@ -53,6 +53,8 @@ CREATE TABLE ADM_OWNER.REMOTE_COMMAND_RESULT
     OUT                      VARCHAR2(4000 BYTE) NULL ,
     ERR                      VARCHAR2(4000 BYTE) NULL ,
     STACK_TRACE              VARCHAR2(4000 BYTE) NULL ,
+    JOB_START                DATE NOT NULL , -- Does not handle DST as local time (oh well - it's complicated to do so in JPA)
+    JOB_END                  DATE NULL , -- Does not handle DST
     CONSTRAINT REMOTE_COMMAND_RESULT_PK PRIMARY KEY (REMOTE_COMMAND_RESULT_ID) ,
     CONSTRAINT ENV_FK1 FOREIGN KEY (ENV_ID) REFERENCES ADM_OWNER.APP_ENV (ENV_ID) ON DELETE CASCADE
 );
