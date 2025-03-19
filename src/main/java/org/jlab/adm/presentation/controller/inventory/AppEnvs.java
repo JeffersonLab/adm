@@ -1,4 +1,4 @@
-package org.jlab.adm.presentation.controller.setup;
+package org.jlab.adm.presentation.controller.inventory;
 
 import java.io.IOException;
 import java.util.List;
@@ -14,7 +14,7 @@ import org.jlab.adm.persistence.entity.AppEnv;
 
 @WebServlet(
     name = "App Envs",
-    urlPatterns = {"/setup/app-envs"})
+    urlPatterns = {"/inventory/app-envs"})
 public class AppEnvs extends HttpServlet {
 
   @EJB AppEnvFacade appEnvFacade;
@@ -26,6 +26,8 @@ public class AppEnvs extends HttpServlet {
 
     request.setAttribute("appenvList", appenvList);
 
-    request.getRequestDispatcher("/WEB-INF/views/setup/app-envs.jsp").forward(request, response);
+    request
+        .getRequestDispatcher("/WEB-INF/views/inventory/app-envs.jsp")
+        .forward(request, response);
   }
 }

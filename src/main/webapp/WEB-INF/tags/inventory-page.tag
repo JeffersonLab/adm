@@ -3,7 +3,7 @@
 <%@attribute name="title"%>
 <%@attribute name="stylesheets" fragment="true"%>
 <%@attribute name="scripts" fragment="true"%>
-<t:page title="${title}" category="Setup">
+<t:page title="${title}" category="Inventory">
     <jsp:attribute name="stylesheets">    
         <jsp:invoke fragment="stylesheets"/>
     </jsp:attribute>
@@ -12,8 +12,8 @@
     </jsp:attribute>
     <jsp:attribute name="secondaryNavigation">
         <ul>
-            <li${'/setup/apps' eq currentPath ? ' class="current-secondary"' : ''}><a href="${pageContext.request.contextPath}/setup/apps">Apps</a></li>
-            <li${'/setup/app-envs' eq currentPath ? ' class="current-secondary"' : ''}><a href="${pageContext.request.contextPath}/setup/app-envs">App Envs</a></li>
+            <li${'/inventory/apps' eq currentPath ? ' class="current-secondary"' : ''}><a href="${pageContext.request.contextPath}/inventory/apps">Apps</a></li>
+            <li${'/inventory/app-envs' eq currentPath ? ' class="current-secondary"' : ''}><a href="${pageContext.request.contextPath}/inventory/app-envs">App Envs</a></li>
         </ul>
     </jsp:attribute>
     <jsp:body>

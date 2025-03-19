@@ -1,4 +1,4 @@
-package org.jlab.adm.presentation.controller.setup;
+package org.jlab.adm.presentation.controller.inventory;
 
 import java.io.IOException;
 import java.util.List;
@@ -14,7 +14,7 @@ import org.jlab.adm.persistence.entity.App;
 
 @WebServlet(
     name = "Apps",
-    urlPatterns = {"/setup/apps"})
+    urlPatterns = {"/inventory/apps"})
 public class Apps extends HttpServlet {
 
   @EJB AppFacade appFacade;
@@ -26,6 +26,6 @@ public class Apps extends HttpServlet {
 
     request.setAttribute("appList", appList);
 
-    request.getRequestDispatcher("/WEB-INF/views/setup/apps.jsp").forward(request, response);
+    request.getRequestDispatcher("/WEB-INF/views/inventory/apps.jsp").forward(request, response);
   }
 }
