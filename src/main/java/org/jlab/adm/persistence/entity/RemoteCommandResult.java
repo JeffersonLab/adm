@@ -40,7 +40,7 @@ public class RemoteCommandResult implements Serializable {
   private String err;
 
   @Column(name = "EXIT_CODE")
-  private int exitCode;
+  private Integer exitCode;
 
   // I'm aware using Date as local time with JPA doesn't handle DST, but doing it "correctly" is
   // enormously
@@ -56,14 +56,14 @@ public class RemoteCommandResult implements Serializable {
   public RemoteCommandResult() {}
 
   public RemoteCommandResult(String stackTrace) {
-    this(-1, null, null, stackTrace);
+    this(null, null, null, stackTrace);
   }
 
-  public RemoteCommandResult(int exitCode, String out, String err) {
+  public RemoteCommandResult(Integer exitCode, String out, String err) {
     this(exitCode, out, err, null);
   }
 
-  public RemoteCommandResult(int exitCode, String out, String err, String stackTrace) {
+  public RemoteCommandResult(Integer exitCode, String out, String err, String stackTrace) {
     this.exitCode = exitCode;
     this.out = out;
     this.err = err;
@@ -90,7 +90,7 @@ public class RemoteCommandResult implements Serializable {
     this.err = err;
   }
 
-  public void setExitCode(int exitCode) {
+  public void setExitCode(Integer exitCode) {
     this.exitCode = exitCode;
   }
 
@@ -110,7 +110,7 @@ public class RemoteCommandResult implements Serializable {
     this.end = end;
   }
 
-  public int getExitCode() {
+  public Integer getExitCode() {
     return exitCode;
   }
 
