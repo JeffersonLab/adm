@@ -11,8 +11,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.jlab.adm.business.session.RemoteCommandResultFacade;
-import org.jlab.adm.persistence.entity.RemoteCommandResult;
+import org.jlab.adm.business.session.DeployJobFacade;
+import org.jlab.adm.persistence.entity.DeployJob;
 import org.jlab.smoothness.presentation.util.Paginator;
 import org.jlab.smoothness.presentation.util.ParamConverter;
 import org.jlab.smoothness.presentation.util.ParamUtil;
@@ -22,7 +22,7 @@ import org.jlab.smoothness.presentation.util.ParamUtil;
     urlPatterns = {"/log"})
 public class Log extends HttpServlet {
 
-  @EJB RemoteCommandResultFacade remoteCommandResultFacade;
+  @EJB DeployJobFacade deployJobFacade;
 
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -33,10 +33,9 @@ public class Log extends HttpServlet {
     int offset = ParamUtil.convertAndValidateNonNegativeInt(request, "offset", 0);
     int maxPerPage = 10;
 
-    List<RemoteCommandResult> recordList =
-        remoteCommandResultFacade.filterList(jobId, appName, offset, maxPerPage);
+    List<DeployJob> recordList = deployJobFacade.filterList(jobId, appName, offset, maxPerPage);
 
-    long totalRecords = remoteCommandResultFacade.countList(jobId, appName);
+    long totalRecords = deployJobFacade.countList(jobId, appName);
 
     Paginator paginator = new Paginator(totalRecords, offset, maxPerPage);
 

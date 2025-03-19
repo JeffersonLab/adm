@@ -7,25 +7,26 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(schema = "ADM_OWNER", name = "REMOTE_COMMAND_RESULT")
-public class RemoteCommandResult implements Serializable {
+@Table(schema = "ADM_OWNER", name = "DEPLOY_JOB")
+public class DeployJob implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @Id
-  @SequenceGenerator(
-      name = "remoteCommandResultId",
-      sequenceName = "REMOTE_COMMAND_RESULT_ID",
-      allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "remoteCommandResultId")
+  @SequenceGenerator(name = "deployJobId", sequenceName = "DEPLOY_JOB_ID", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "deployJobId")
   @Basic(optional = false)
   @NotNull
-  @Column(name = "REMOTE_COMMAND_RESULT_ID", nullable = false, precision = 22, scale = 0)
-  private BigInteger remoteCommandResultId;
+  @Column(name = "DEPLOY_JOB_ID", nullable = false, precision = 22, scale = 0)
+  private BigInteger deployJobId;
 
   @NotNull
-  @JoinColumn(name = "ENV_ID", referencedColumnName = "ENV_ID", nullable = false)
+  @JoinColumn(name = "APP_ENV_ID", referencedColumnName = "APP_ENV_ID", nullable = false)
   @ManyToOne(optional = false)
   private AppEnv appEnv;
+
+  @NotNull
+  @Column(name = "VERSION")
+  private String version;
 
   @Lob
   @Column(name = "STACK_TRACE")
@@ -53,14 +54,15 @@ public class RemoteCommandResult implements Serializable {
   @Temporal(TemporalType.TIMESTAMP)
   private Date end;
 
-  public RemoteCommandResult() {}
+  public DeployJob() {}
 
-  public RemoteCommandResult(AppEnv appEnv) {
-    this(appEnv, new Date(), null, null, null, null, null);
+  public DeployJob(AppEnv appEnv, String version) {
+    this(appEnv, version, new Date(), null, null, null, null, null);
   }
 
-  public RemoteCommandResult(
+  public DeployJob(
       AppEnv appEnv,
+      String version,
       Date start,
       Date end,
       Integer exitCode,
@@ -68,6 +70,7 @@ public class RemoteCommandResult implements Serializable {
       String err,
       String stackTrace) {
     this.appEnv = appEnv;
+    this.version = version;
     this.start = start;
     this.end = end;
     this.exitCode = exitCode;
@@ -76,12 +79,12 @@ public class RemoteCommandResult implements Serializable {
     this.stackTrace = stackTrace;
   }
 
-  public BigInteger getRemoteCommandResultId() {
-    return remoteCommandResultId;
+  public BigInteger getDeployJobId() {
+    return deployJobId;
   }
 
-  public void setRemoteCommandResultId(BigInteger remoteCommandResultId) {
-    this.remoteCommandResultId = remoteCommandResultId;
+  public void setDeployJobId(BigInteger remoteCommandResultId) {
+    this.deployJobId = remoteCommandResultId;
   }
 
   public void setStackTrace(String stackTrace) {
@@ -138,5 +141,13 @@ public class RemoteCommandResult implements Serializable {
 
   public void setAppEnv(AppEnv appEnv) {
     this.appEnv = appEnv;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
   }
 }

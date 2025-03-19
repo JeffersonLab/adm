@@ -9,7 +9,7 @@ import javax.ejb.EJB;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import org.jlab.adm.persistence.entity.AppEnv;
-import org.jlab.adm.persistence.entity.RemoteCommandResult;
+import org.jlab.adm.persistence.entity.DeployJob;
 import org.jlab.smoothness.business.exception.UserFriendlyException;
 
 @Stateless
@@ -21,7 +21,7 @@ public class DeployerFacade {
 
   @EJB AppEnvFacade appEnvFacade;
 
-  @EJB RemoteCommandResultFacade remoteCommandResultFacade;
+  @EJB DeployJobFacade deployJobFacade;
 
   @PermitAll
   public BigInteger deploy(String env, String app, String ver)
@@ -49,13 +49,13 @@ public class DeployerFacade {
     // Ensure version string is semver, and therefore also unlikely a shell command
     validateSemver(ver);
 
-    RemoteCommandResult result = new RemoteCommandResult(appEnv);
+    DeployJob job = new DeployJob(appEnv, ver);
 
-    BigInteger remoteCommandResultId = remoteCommandResultFacade.createReturnId(result);
+    BigInteger jobId = deployJobFacade.createReturnId(job);
 
-    sshFacade.asyncExecuteRemoteCommand(result, ver);
+    sshFacade.asyncExecuteRemoteCommand(job);
 
-    return remoteCommandResultId;
+    return jobId;
   }
 
   private void validateSemver(String ver) throws UserFriendlyException {

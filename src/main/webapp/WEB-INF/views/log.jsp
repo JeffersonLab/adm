@@ -114,7 +114,7 @@
                 <thead>
                     <tr>
                         <th>Job #</th>
-                        <th>App Env</th>
+                        <th>App Env Ver</th>
                         <th>Period</th>
                         <th>Exit Code / Stack Trace</th>
                         <th>Stdout/Stderr</th>
@@ -123,8 +123,8 @@
                 <tbody>
                     <c:forEach var="record" items="${recordList}">
                         <tr data-out="${fn:escapeXml(record.out)}" data-err="${fn:escapeXml(record.err)}" data-trace="${fn:escapeXml(record.stackTrace)}">
-                            <td><c:out value="${record.remoteCommandResultId}"/></td>
-                            <td><c:out value="${record.appEnv.app.name}"/> / <c:out value="${record.appEnv.name}"/></td>
+                            <td><c:out value="${record.deployJobId}"/></td>
+                            <td><c:out value="${record.appEnv.app.name}"/> / <c:out value="${record.appEnv.name}"/> / <c:out value="${record.version}"/></td>
                             <td>
                                 <fmt:formatDate value="${record.start}" pattern="dd-MMM-yyyy HH:mm:ss"/> -
                                 <fmt:formatDate value="${record.end}" pattern="dd-MMM-yyyy HH:mm:ss"/>

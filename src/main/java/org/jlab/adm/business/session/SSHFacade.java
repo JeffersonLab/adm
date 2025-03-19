@@ -16,7 +16,7 @@ import javax.ejb.Stateless;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.session.ClientSession;
 import org.jlab.adm.persistence.entity.AppEnv;
-import org.jlab.adm.persistence.entity.RemoteCommandResult;
+import org.jlab.adm.persistence.entity.DeployJob;
 import org.jlab.adm.presentation.controller.Deploy;
 import org.jlab.smoothness.business.exception.UserFriendlyException;
 
@@ -28,30 +28,30 @@ public class SSHFacade {
   final Duration verifyTimeout = Duration.ofSeconds(5);
   final Duration authTimeout = Duration.ofSeconds(5);
 
-  @EJB RemoteCommandResultFacade remoteCommandResultFacade;
+  @EJB DeployJobFacade deployJobFacade;
 
   @Asynchronous
   @PermitAll
-  public void asyncExecuteRemoteCommand(RemoteCommandResult result, String version)
-      throws UserFriendlyException {
+  public void asyncExecuteRemoteCommand(DeployJob job) throws UserFriendlyException {
     try {
-      executeRemoteCommand(result, version);
+      executeRemoteCommand(job);
     } catch (Throwable t) {
       StringWriter sw = new StringWriter();
       PrintWriter pw = new PrintWriter(sw);
       t.printStackTrace(pw);
 
-      result.setStackTrace(sw.toString());
+      job.setStackTrace(sw.toString());
     }
 
-    result.setEnd(new Date());
+    job.setEnd(new Date());
 
-    remoteCommandResultFacade.edit(result);
+    deployJobFacade.edit(job);
   }
 
-  private void executeRemoteCommand(RemoteCommandResult result, String version) throws IOException {
+  private void executeRemoteCommand(DeployJob job) throws IOException {
 
-    AppEnv env = result.getAppEnv();
+    AppEnv env = job.getAppEnv();
+    String version = job.getVersion();
     String username = env.getRunServiceUsername();
     String hostname = env.getHostname();
     int port = env.getPort();
@@ -88,8 +88,8 @@ public class SSHFacade {
     client.stop();
     client.close();
 
-    result.setExitCode(exitCode);
-    result.setOut(out);
-    result.setErr(err);
+    job.setExitCode(exitCode);
+    job.setOut(out);
+    job.setErr(err);
   }
 }

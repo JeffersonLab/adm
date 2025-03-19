@@ -9,10 +9,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
-import org.jlab.adm.persistence.entity.RemoteCommandResult;
+import org.jlab.adm.persistence.entity.DeployJob;
 
 @Stateless
-public class RemoteCommandResultFacade extends AbstractFacade<RemoteCommandResult> {
+public class DeployJobFacade extends AbstractFacade<DeployJob> {
   @PersistenceContext(unitName = "admPU")
   protected EntityManager em;
 
@@ -21,16 +21,16 @@ public class RemoteCommandResultFacade extends AbstractFacade<RemoteCommandResul
     return em;
   }
 
-  public RemoteCommandResultFacade() {
-    super(RemoteCommandResult.class);
+  public DeployJobFacade() {
+    super(DeployJob.class);
   }
 
   private List<Predicate> getFilters(
-      CriteriaBuilder cb, Root<RemoteCommandResult> root, BigInteger jobId, String appName) {
+      CriteriaBuilder cb, Root<DeployJob> root, BigInteger jobId, String appName) {
     List<Predicate> filters = new ArrayList<>();
 
     if (jobId != null) {
-      filters.add(cb.equal(root.get("remoteCommandResultId"), jobId));
+      filters.add(cb.equal(root.get("deployJobId"), jobId));
     }
 
     if (appName != null && !appName.isEmpty()) {
@@ -42,11 +42,10 @@ public class RemoteCommandResultFacade extends AbstractFacade<RemoteCommandResul
   }
 
   @PermitAll
-  public List<RemoteCommandResult> filterList(
-      BigInteger jobId, String appName, int offset, int max) {
+  public List<DeployJob> filterList(BigInteger jobId, String appName, int offset, int max) {
     CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
-    CriteriaQuery<RemoteCommandResult> cq = cb.createQuery(RemoteCommandResult.class);
-    Root<RemoteCommandResult> root = cq.from(RemoteCommandResult.class);
+    CriteriaQuery<DeployJob> cq = cb.createQuery(DeployJob.class);
+    Root<DeployJob> root = cq.from(DeployJob.class);
     cq.select(root);
 
     List<Predicate> filters = getFilters(cb, root, jobId, appName);
@@ -56,7 +55,7 @@ public class RemoteCommandResultFacade extends AbstractFacade<RemoteCommandResul
     }
 
     List<Order> orders = new ArrayList<>();
-    Path p0 = root.get("remoteCommandResultId");
+    Path p0 = root.get("deployJobId");
     Order o0 = cb.desc(p0);
     orders.add(o0);
     cq.orderBy(orders);
@@ -71,7 +70,7 @@ public class RemoteCommandResultFacade extends AbstractFacade<RemoteCommandResul
   public long countList(BigInteger jobId, String appName) {
     CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
     CriteriaQuery<Long> cq = cb.createQuery(Long.class);
-    Root<RemoteCommandResult> root = cq.from(RemoteCommandResult.class);
+    Root<DeployJob> root = cq.from(DeployJob.class);
 
     List<Predicate> filters = getFilters(cb, root, jobId, appName);
 
@@ -85,9 +84,9 @@ public class RemoteCommandResultFacade extends AbstractFacade<RemoteCommandResul
   }
 
   @PermitAll
-  public BigInteger createReturnId(RemoteCommandResult result) {
+  public BigInteger createReturnId(DeployJob result) {
     create(result);
     em.flush();
-    return result.getRemoteCommandResultId();
+    return result.getDeployJobId();
   }
 }
