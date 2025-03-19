@@ -32,29 +32,26 @@ public class SSHFacade {
 
   @Asynchronous
   @PermitAll
-  public void asyncExecuteRemoteCommand(AppEnv env, String version) throws UserFriendlyException {
-    RemoteCommandResult result = null;
-    Date start = new Date();
-
+  public void asyncExecuteRemoteCommand(RemoteCommandResult result, String version)
+      throws UserFriendlyException {
     try {
-      result = executeRemoteCommand(env, version);
+      executeRemoteCommand(result, version);
     } catch (Throwable t) {
       StringWriter sw = new StringWriter();
       PrintWriter pw = new PrintWriter(sw);
       t.printStackTrace(pw);
 
-      result = new RemoteCommandResult(sw.toString());
+      result.setStackTrace(sw.toString());
     }
 
-    result.setAppEnv(env);
-    result.setStart(start);
     result.setEnd(new Date());
 
-    remoteCommandResultFacade.create(result);
+    remoteCommandResultFacade.edit(result);
   }
 
-  private RemoteCommandResult executeRemoteCommand(AppEnv env, String version) throws IOException {
+  private void executeRemoteCommand(RemoteCommandResult result, String version) throws IOException {
 
+    AppEnv env = result.getAppEnv();
     String username = env.getRunServiceUsername();
     String hostname = env.getHostname();
     int port = env.getPort();
@@ -70,7 +67,6 @@ public class SSHFacade {
     int exitCode = 0;
     String out;
     String err;
-    String stackTrace = null;
 
     client.start();
 
@@ -92,6 +88,8 @@ public class SSHFacade {
     client.stop();
     client.close();
 
-    return new RemoteCommandResult(exitCode, out, err);
+    result.setExitCode(exitCode);
+    result.setOut(out);
+    result.setErr(err);
   }
 }

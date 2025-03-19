@@ -2,6 +2,7 @@ package org.jlab.adm.presentation.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -13,7 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jlab.adm.business.session.DeployerFacade;
-import org.jlab.adm.persistence.entity.RemoteCommandResult;
 import org.jlab.smoothness.business.exception.UserFriendlyException;
 
 @WebServlet(
@@ -35,11 +35,11 @@ public class Deploy extends HttpServlet {
 
     LOGGER.log(Level.INFO, "Requesting deploy of {0}, {1}, {2}", new Object[] {env, app, ver});
 
-    RemoteCommandResult result = null;
     String exceptionMessage = null;
+    BigInteger jobId = null;
 
     try {
-      deployerFacade.deploy(env, app, ver);
+      jobId = deployerFacade.deploy(env, app, ver);
     } catch (UserFriendlyException e) {
       exceptionMessage = e.getMessage();
     } catch (IOException e) {
@@ -54,6 +54,8 @@ public class Deploy extends HttpServlet {
 
     if (exceptionMessage != null) {
       json.add("exception", exceptionMessage);
+    } else {
+      json.add("jobId", jobId);
     }
 
     String jsonStr = json.build().toString();

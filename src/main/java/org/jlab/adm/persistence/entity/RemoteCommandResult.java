@@ -1,7 +1,7 @@
 package org.jlab.adm.persistence.entity;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -20,7 +20,7 @@ public class RemoteCommandResult implements Serializable {
   @Basic(optional = false)
   @NotNull
   @Column(name = "REMOTE_COMMAND_RESULT_ID", nullable = false, precision = 22, scale = 0)
-  private BigDecimal remoteCommandResultId;
+  private BigInteger remoteCommandResultId;
 
   @NotNull
   @JoinColumn(name = "ENV_ID", referencedColumnName = "ENV_ID", nullable = false)
@@ -55,26 +55,32 @@ public class RemoteCommandResult implements Serializable {
 
   public RemoteCommandResult() {}
 
-  public RemoteCommandResult(String stackTrace) {
-    this(null, null, null, stackTrace);
+  public RemoteCommandResult(AppEnv appEnv) {
+    this(appEnv, new Date(), null, null, null, null, null);
   }
 
-  public RemoteCommandResult(Integer exitCode, String out, String err) {
-    this(exitCode, out, err, null);
-  }
-
-  public RemoteCommandResult(Integer exitCode, String out, String err, String stackTrace) {
+  public RemoteCommandResult(
+      AppEnv appEnv,
+      Date start,
+      Date end,
+      Integer exitCode,
+      String out,
+      String err,
+      String stackTrace) {
+    this.appEnv = appEnv;
+    this.start = start;
+    this.end = end;
     this.exitCode = exitCode;
     this.out = out;
     this.err = err;
     this.stackTrace = stackTrace;
   }
 
-  public BigDecimal getRemoteCommandResultId() {
+  public BigInteger getRemoteCommandResultId() {
     return remoteCommandResultId;
   }
 
-  public void setRemoteCommandResultId(BigDecimal remoteCommandResultId) {
+  public void setRemoteCommandResultId(BigInteger remoteCommandResultId) {
     this.remoteCommandResultId = remoteCommandResultId;
   }
 

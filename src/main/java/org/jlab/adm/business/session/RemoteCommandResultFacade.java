@@ -1,5 +1,6 @@
 package org.jlab.adm.business.session;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.security.PermitAll;
@@ -76,5 +77,12 @@ public class RemoteCommandResultFacade extends AbstractFacade<RemoteCommandResul
     cq.select(cb.count(root));
     TypedQuery<Long> q = getEntityManager().createQuery(cq);
     return q.getSingleResult();
+  }
+
+  @PermitAll
+  public BigInteger createReturnId(RemoteCommandResult result) {
+    create(result);
+    em.flush();
+    return result.getRemoteCommandResultId();
   }
 }

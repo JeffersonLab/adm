@@ -25,7 +25,7 @@ jlab.adm.deploy = function () {
                 $("#app").val("");
                 $("#ver").val("");
                 $("#result-message").addClass("success");
-                $("#result-message").text("Success: Job submitted successfully. See asynchronous output for result.");
+                $("#result-message").html('Success: Job submitted successfully. See asynchronous log for job <a href="/adm/log?jobId=' + data.jobId + '">#' + data.jobId + '</a>');
             }
         });
 
