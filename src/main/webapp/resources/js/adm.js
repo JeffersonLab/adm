@@ -6,6 +6,9 @@ jlab.adm.deploy = function () {
     app = $("#app").val(),
     ver = $("#ver").val();
 
+    $("#result-message").removeClass("success");
+    $("#result-message").text("");
+
     let url = jlab.contextPath + "/deploy",
         data = {env: env, app: app, ver: ver};
 

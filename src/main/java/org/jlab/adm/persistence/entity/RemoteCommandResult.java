@@ -27,13 +27,16 @@ public class RemoteCommandResult implements Serializable {
   @ManyToOne(optional = false)
   private AppEnv appEnv;
 
-  @Column(name = "STACK_TRACE", length = 4000)
+  @Lob
+  @Column(name = "STACK_TRACE")
   private String stackTrace;
 
-  @Column(name = "OUT", length = 4000)
+  @Lob
+  @Column(name = "OUT")
   private String out;
 
-  @Column(name = "ERR", length = 4000)
+  @Lob
+  @Column(name = "ERR")
   private String err;
 
   @Column(name = "EXIT_CODE")

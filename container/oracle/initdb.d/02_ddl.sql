@@ -50,9 +50,9 @@ CREATE TABLE ADM_OWNER.REMOTE_COMMAND_RESULT
     REMOTE_COMMAND_RESULT_ID INTEGER NOT NULL,
     ENV_ID                   INTEGER NOT NULL ,
     EXIT_CODE                INTEGER NULL ,
-    OUT                      VARCHAR2(4000 BYTE) NULL ,
-    ERR                      VARCHAR2(4000 BYTE) NULL ,
-    STACK_TRACE              VARCHAR2(4000 BYTE) NULL ,
+    OUT                      CLOB NULL ,
+    ERR                      CLOB NULL ,
+    STACK_TRACE              CLOB NULL ,
     JOB_START                DATE NOT NULL , -- Does not handle DST as local time (oh well - it's complicated to do so in JPA)
     JOB_END                  DATE NULL , -- Does not handle DST
     CONSTRAINT REMOTE_COMMAND_RESULT_PK PRIMARY KEY (REMOTE_COMMAND_RESULT_ID) ,
