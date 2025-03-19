@@ -56,6 +56,10 @@
                 $("#view-dialog").dialog('open');
                 return false;
             });
+            $(document).on("click", ".default-clear-panel", function () {
+                $("#app-name").val('');
+                return false;
+            });
             $(function() {
                 $("#view-dialog").dialog({
                     autoOpen: false,
@@ -69,7 +73,31 @@
     </jsp:attribute>
     <jsp:body>
         <section>
-            <h2 id="page-header-title"><c:out value="${title}"/></h2>
+            <s:filter-flyout-widget clearButton="true" ribbon="true">
+                <form class="filter-form" method="get" action="log">
+                    <div class="filter-form-panel">
+                        <fieldset>
+                            <legend>Filter</legend>
+                            <ul class="key-value-list">
+                                <li>
+                                    <div class="li-key">
+                                        <label for="app-name">App Name</label>
+                                    </div>
+                                    <div class="li-value">
+                                        <input id="app-name"
+                                               name="appName" value="${fn:escapeXml(param.appName)}"
+                                               placeholder="name"/>
+                                        <div>(use % as wildcard)</div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </fieldset>
+                    </div>
+                    <input type="hidden" class="offset-input" name="offset" value="0"/>
+                    <input class="filter-form-submit-button" type="submit" value="Apply"/>
+                </form>
+            </s:filter-flyout-widget>
+            <h2 class="page-header-title"><c:out value="${title}"/></h2>
             <div class="message-box"><c:out value="${selectionMessage}"/></div>
             <table class="data-table">
                 <thead>
@@ -142,6 +170,12 @@
                     </c:forEach>
                 </tbody>
             </table>
+            <button class="previous-button" type="button" data-offset="${paginator.previousOffset}"
+                    value="Previous"${paginator.previous ? '' : ' disabled="disabled"'}>Previous
+            </button>
+            <button class="next-button" type="button" data-offset="${paginator.nextOffset}"
+                    value="Next"${paginator.next ? '' : ' disabled="disabled"'}>Next
+            </button>
             <div id="view-dialog" class="dialog">
                 <div id="log-content"></div>
             </div>
