@@ -10,8 +10,11 @@ insert into adm_owner.app (app_id, name, doc_url) values (adm_owner.app_id.nextv
 insert into adm_owner.app (app_id, name, doc_url) values (adm_owner.app_id.nextval, 'workmap', 'https://github.com/jeffersonlab/workmap');
 
 -- App Envs
-insert into adm_owner.app_env(env_id, app_id, name, request_service_username, run_service_username, hostname, port, deploy_command) values (adm_owner.env_id.nextval, 1, 'local-dev', 'deployer-service', 'testuser', 'localhost', 1234, 'touch /tmp/hello && echo');
-insert into adm_owner.app_env(env_id, app_id, name, request_service_username, run_service_username, hostname, port, deploy_command) values (adm_owner.env_id.nextval, 1, 'local-demo', 'deployer-service', 'testuser', 'sshd', 22, 'touch /tmp/hello && echo');
-insert into adm_owner.app_env(env_id, app_id, name, request_service_username, run_service_username, hostname, port, deploy_command) values (adm_owner.env_id.nextval, 2, 'prod', 'deployer-service', 'wildfly-service', 'prodhost1.example.com', 22, '/opt/wildfly/deploy.sh dtm');
-insert into adm_owner.app_env(env_id, app_id, name, request_service_username, run_service_username, hostname, port, deploy_command) values (adm_owner.env_id.nextval, 2, 'dev', 'deployer-service', 'wildfly-service', 'devhost1.example.com', 22, '/opt/wildfly/deploy.sh dtm');
-insert into adm_owner.app_env(env_id, app_id, name, request_service_username, run_service_username, hostname, port, deploy_command) values (adm_owner.env_id.nextval, 3, 'dev', 'deployer-service', 'wildfly-service', 'devhost2.example.com', 22, '/opt/wildfly/deploy.sh workmap');
+insert into adm_owner.app_env(app_env_id, app_id, name, request_service_username, run_service_username, hostname, port, deploy_command) values (adm_owner.app_env_id.nextval, 1, 'local-dev', 'deployer-service', 'testuser', 'localhost', 1234, 'touch /tmp/hello && echo');
+insert into adm_owner.app_env(app_env_id, app_id, name, request_service_username, run_service_username, hostname, port, deploy_command) values (adm_owner.app_env_id.nextval, 1, 'local-demo', 'deployer-service', 'testuser', 'sshd', 22, 'touch /tmp/hello && echo');
+insert into adm_owner.app_env(app_env_id, app_id, name, request_service_username, run_service_username, hostname, port, deploy_command) values (adm_owner.app_env_id.nextval, 2, 'prod', 'deployer-service', 'wildfly-service', 'prodhost1.example.com', 22, '/opt/wildfly/deploy.sh dtm');
+insert into adm_owner.app_env(app_env_id, app_id, name, request_service_username, run_service_username, hostname, port, deploy_command) values (adm_owner.app_env_id.nextval, 2, 'dev', 'deployer-service', 'wildfly-service', 'devhost1.example.com', 22, '/opt/wildfly/deploy.sh dtm');
+insert into adm_owner.app_env(app_env_id, app_id, name, request_service_username, run_service_username, hostname, port, deploy_command) values (adm_owner.app_env_id.nextval, 3, 'dev', 'deployer-service', 'wildfly-service', 'devhost2.example.com', 22, '/opt/wildfly/deploy.sh workmap');
+
+-- Results
+insert into adm_owner.deploy_job(deploy_job_id, app_env_id, version, exit_code, out, err, stack_trace, job_start, job_end) values (adm_owner.deploy_job_id.nextval, 1, '1.0.0', 0, null, null, null, sysdate, sysdate + (1/3600));

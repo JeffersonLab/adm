@@ -15,8 +15,8 @@ public class AppEnv implements Serializable {
   @Id
   @Basic(optional = false)
   @NotNull
-  @Column(name = "ENV_ID", nullable = false, precision = 22, scale = 0)
-  private BigDecimal envId;
+  @Column(name = "APP_ENV_ID", nullable = false, precision = 22, scale = 0)
+  private BigDecimal appEnvId;
 
   @NotNull
   @JoinColumn(name = "APP_ID", referencedColumnName = "APP_ID", nullable = false)
@@ -58,12 +58,12 @@ public class AppEnv implements Serializable {
   @Column(name = "DEPLOY_COMMAND", nullable = false, length = 128)
   private String deployCommand;
 
-  public BigDecimal getEnvId() {
-    return envId;
+  public BigDecimal getAppEnvId() {
+    return appEnvId;
   }
 
-  public void setEnvId(BigDecimal envId) {
-    this.envId = envId;
+  public void setAppEnvId(BigDecimal envId) {
+    this.appEnvId = envId;
   }
 
   public App getApp() {

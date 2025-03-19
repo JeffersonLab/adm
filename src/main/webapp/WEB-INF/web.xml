@@ -59,6 +59,8 @@
             <url-pattern>/sso</url-pattern>
             <url-pattern>/choose</url-pattern>
             <url-pattern>/deploy</url-pattern>
+            <url-pattern>/log</url-pattern>
+            <url-pattern>/inventory/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>**</role-name>

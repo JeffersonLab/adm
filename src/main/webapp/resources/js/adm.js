@@ -6,6 +6,9 @@ jlab.adm.deploy = function () {
     app = $("#app").val(),
     ver = $("#ver").val();
 
+    $("#result-message").removeClass("success");
+    $("#result-message").text("");
+
     let url = jlab.contextPath + "/deploy",
         data = {env: env, app: app, ver: ver};
 
@@ -17,14 +20,12 @@ jlab.adm.deploy = function () {
             if(Object.hasOwn(data, 'exception')) {
                 $("#result-message").removeClass("success");
                 $("#result-message").text("Fail: " + data.exception);
-            } else if(Object.hasOwn(data, 'out')) {
+            } else {
                 $("#env").val("");
                 $("#app").val("");
                 $("#ver").val("");
                 $("#result-message").addClass("success");
-                $("#result-message").text("Success: Exit code 0");
-                $("#out").text(data.out);
-                $("#err").text(data.err);
+                $("#result-message").html('Success: Job submitted successfully. See asynchronous log for job <a href="/adm/log?jobId=' + data.jobId + '">#' + data.jobId + '</a>');
             }
         });
 

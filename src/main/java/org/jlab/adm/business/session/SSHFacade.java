@@ -2,15 +2,23 @@ package org.jlab.adm.business.session;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.security.PermitAll;
+import javax.ejb.Asynchronous;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.session.ClientSession;
-import org.jlab.adm.persistence.model.RemoteCommandResult;
+import org.jlab.adm.persistence.entity.AppEnv;
+import org.jlab.adm.persistence.entity.DeployJob;
 import org.jlab.adm.presentation.controller.Deploy;
+import org.jlab.smoothness.business.exception.UserFriendlyException;
 
 @Stateless
 public class SSHFacade {
@@ -20,12 +28,43 @@ public class SSHFacade {
   final Duration verifyTimeout = Duration.ofSeconds(5);
   final Duration authTimeout = Duration.ofSeconds(5);
 
-  public RemoteCommandResult executeRemoteCommand(
-      String username, String hostname, int port, String command) throws IOException {
+  @EJB DeployJobFacade deployJobFacade;
+
+  @Asynchronous
+  @PermitAll
+  public void asyncExecuteRemoteCommand(DeployJob job) throws UserFriendlyException {
+    try {
+      executeRemoteCommand(job);
+    } catch (Throwable t) {
+      StringWriter sw = new StringWriter();
+      PrintWriter pw = new PrintWriter(sw);
+      t.printStackTrace(pw);
+
+      job.setStackTrace(sw.toString());
+    }
+
+    job.setEnd(new Date());
+
+    deployJobFacade.edit(job);
+  }
+
+  private void executeRemoteCommand(DeployJob job) throws IOException {
+
+    AppEnv env = job.getAppEnv();
+    String version = job.getVersion();
+    String username = env.getRunServiceUsername();
+    String hostname = env.getHostname();
+    int port = env.getPort();
+    String command = env.getDeployCommand();
+
+    // The template expectation is to append version as last argument to the deploy command
+    command = command + " " + version;
+
     LOGGER.log(
         Level.INFO, "execute " + username + "@" + hostname + ":" + port + " \"" + command + "\"");
     SshClient client = SshClient.setUpDefaultClient();
 
+    int exitCode = 0;
     String out;
     String err;
 
@@ -47,7 +86,10 @@ public class SSHFacade {
     } // try with resources automatically calls session.close()
 
     client.stop();
+    client.close();
 
-    return new RemoteCommandResult(out, err);
+    job.setExitCode(exitCode);
+    job.setOut(out);
+    job.setErr(err);
   }
 }

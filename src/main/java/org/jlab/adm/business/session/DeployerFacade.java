@@ -1,6 +1,7 @@
 package org.jlab.adm.business.session;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.regex.Pattern;
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
@@ -8,7 +9,7 @@ import javax.ejb.EJB;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import org.jlab.adm.persistence.entity.AppEnv;
-import org.jlab.adm.persistence.model.RemoteCommandResult;
+import org.jlab.adm.persistence.entity.DeployJob;
 import org.jlab.smoothness.business.exception.UserFriendlyException;
 
 @Stateless
@@ -20,8 +21,10 @@ public class DeployerFacade {
 
   @EJB AppEnvFacade appEnvFacade;
 
+  @EJB DeployJobFacade deployJobFacade;
+
   @PermitAll
-  public RemoteCommandResult deploy(String env, String app, String ver)
+  public BigInteger deploy(String env, String app, String ver)
       throws UserFriendlyException, IOException {
 
     String username = context.getCallerPrincipal().getName();
@@ -37,10 +40,6 @@ public class DeployerFacade {
     }
 
     String requestServiceUsername = appEnv.getRequestServiceUsername();
-    String runServiceUsername = appEnv.getRunServiceUsername();
-    String hostname = appEnv.getHostname();
-    int port = appEnv.getPort();
-    String command = appEnv.getDeployCommand();
 
     if (!username.equals(requestServiceUsername) && !context.isCallerInRole("adm-admin")) {
       throw new UserFriendlyException(
@@ -50,13 +49,13 @@ public class DeployerFacade {
     // Ensure version string is semver, and therefore also unlikely a shell command
     validateSemver(ver);
 
-    // The template expectation is to append version as last argument to the deploy command
-    command = command + " " + ver;
+    DeployJob job = new DeployJob(appEnv, ver);
 
-    RemoteCommandResult result =
-        sshFacade.executeRemoteCommand(runServiceUsername, hostname, port, command);
+    BigInteger jobId = deployJobFacade.createReturnId(job);
 
-    return result;
+    sshFacade.asyncExecuteRemoteCommand(job);
+
+    return jobId;
   }
 
   private void validateSemver(String ver) throws UserFriendlyException {
