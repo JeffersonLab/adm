@@ -6,7 +6,7 @@
 <%@taglib prefix="t" tagdir="/WEB-INF/tags"%>
 <%@taglib prefix="adm" uri="http://jlab.org/adm/functions"%>
 <c:set value="Log" var="title"/>
-<t:page title="${title}">
+<s:page title="${title}">
     <jsp:attribute name="stylesheets">
         <style>
             #log-content {
@@ -192,4 +192,4 @@
             </div>
         </section>
     </jsp:body>
-</t:page>
+</s:page>

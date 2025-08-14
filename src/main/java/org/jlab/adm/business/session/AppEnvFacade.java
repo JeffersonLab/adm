@@ -11,7 +11,7 @@ import org.jlab.adm.persistence.entity.AppEnv;
 
 @Stateless
 public class AppEnvFacade extends AbstractFacade<AppEnv> {
-  @PersistenceContext(unitName = "admPU")
+  @PersistenceContext(unitName = "webappPU")
   protected EntityManager em;
 
   @Override

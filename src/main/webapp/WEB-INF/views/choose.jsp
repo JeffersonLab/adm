@@ -5,7 +5,7 @@
 <%@taglib prefix="s" uri="http://jlab.org/jsp/smoothness"%>
 <%@taglib prefix="t" tagdir="/WEB-INF/tags"%>
 <c:set value="Choose" var="title"/>
-<t:page title="${title}">
+<s:page title="${title}">
     <jsp:attribute name="stylesheets">
     </jsp:attribute>
     <jsp:attribute name="scripts">
@@ -27,4 +27,4 @@
             <div id="err"></div>
         </section>
     </jsp:body>
-</t:page>
+</s:page>

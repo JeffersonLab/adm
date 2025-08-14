@@ -13,7 +13,7 @@ import org.jlab.adm.persistence.entity.DeployJob;
 
 @Stateless
 public class DeployJobFacade extends AbstractFacade<DeployJob> {
-  @PersistenceContext(unitName = "admPU")
+  @PersistenceContext(unitName = "webappPU")
   protected EntityManager em;
 
   @Override

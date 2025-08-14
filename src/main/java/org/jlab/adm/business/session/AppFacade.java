@@ -7,7 +7,7 @@ import org.jlab.adm.persistence.entity.App;
 
 @Stateless
 public class AppFacade extends AbstractFacade<App> {
-  @PersistenceContext(unitName = "admPU")
+  @PersistenceContext(unitName = "webappPU")
   protected EntityManager em;
 
   @Override
