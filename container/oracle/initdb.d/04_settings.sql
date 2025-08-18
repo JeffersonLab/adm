@@ -2,7 +2,7 @@ alter session set container = XEPDB1;
 
 -- SETTING CONFIG
 -- Update with your schema name
-ALTER SESSION SET CURRENT_SCHEMA = CNM_OWNER;
+ALTER SESSION SET CURRENT_SCHEMA = ADM_OWNER;
 
 -- REQUIRED: Admin Config
 insert into SETTING (KEY, VALUE, TYPE, DESCRIPTION, TAG, WEIGHT) values ('ADMIN_ROLE_NAME', 'adm-admin', 'STRING', 'App-specific Admin Role Name', 'AUTH', 1);
