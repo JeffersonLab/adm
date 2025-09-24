@@ -30,7 +30,8 @@ dependencies {
     // Wildfly 27.0.1.Final provides:
     providedCompile 'jakarta.platform:jakarta.jakartaee-api:10.0.0',
                     'jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:3.0.2',
-                    'org.hibernate:hibernate-core:6.6.19.Final'
+                    'org.hibernate:hibernate-core:6.6.19.Final',
+                    'org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.0' // Impl may vary, declaration helps IntelliJ find taglib URI
 }
 tasks.named('jar') {
     enabled = false
