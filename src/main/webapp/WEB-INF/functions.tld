@@ -8,7 +8,7 @@
     <display-name>Custom Functions</display-name>    
     <tlib-version>1.0</tlib-version>
     <short-name>adm</short-name>
-    <uri>http://jlab.org/adm/functions</uri>
+    <uri>jlab.tags.adm</uri>
 
     <function>
         <name>millisToHumanReadable</name>

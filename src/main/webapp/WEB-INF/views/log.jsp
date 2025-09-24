@@ -4,7 +4,7 @@
 <%@taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <%@taglib prefix="s" uri="jlab.tags.smoothness"%>
 <%@taglib prefix="t" tagdir="/WEB-INF/tags"%>
-<%@taglib prefix="adm" uri="http://jlab.org/adm/functions"%>
+<%@taglib prefix="adm" uri="jlab.tags.adm"%>
 <c:set value="Log" var="title"/>
 <s:page title="${title}">
     <jsp:attribute name="stylesheets">
