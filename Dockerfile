@@ -35,16 +35,6 @@ RUN /server-setup.sh /app-setup.env wildfly_start_and_wait \
      && tar -xvzf apache-sshd-2.12.1.tar.gz \
      && chmod +x apache-sshd-2.12.1/bin/ssh.sh
 
-# old centos yum is busted: https://serverfault.com/a/1161847/107456
-RUN sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/CentOS-*.repo \
-    && sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/CentOS-*.repo \
-    && sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/CentOS-*.repo \
-    && yum install openssh-clients -y
-
 USER jboss
 COPY --from=builder /app/build/libs/* /opt/jboss/wildfly/standalone/deployments
-ENTRYPOINT /pre-entrypoint.sh
-
-FROM runner AS dev
-USER root
-RUN yum install git -y
+ENTRYPOINT ["/pre-entrypoint.sh"]
