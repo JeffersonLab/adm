@@ -1,5 +1,5 @@
 # adm [![CI](https://github.com/JeffersonLab/adm/actions/workflows/ci.yaml/badge.svg)](https://github.com/JeffersonLab/adm/actions/workflows/ci.yaml) [![Docker](https://img.shields.io/docker/v/jeffersonlab/adm?sort=semver&label=DockerHub)](https://hub.docker.com/r/jeffersonlab/adm)
-A [Java EE 8](https://en.wikipedia.org/wiki/Jakarta_EE) web application for app deployment at Jefferson Lab built with the [Smoothness](https://github.com/JeffersonLab/smoothness) web template.
+A [Jakarta EE 10](https://en.wikipedia.org/wiki/Jakarta_EE) web application for app deployment at Jefferson Lab built with the [Smoothness](https://github.com/JeffersonLab/smoothness) web template.
 
 
 ![Screenshot](https://github.com/JeffersonLab/adm/raw/main/Screenshot.png?raw=true "Screenshot")
@@ -38,10 +38,10 @@ http://localhost:8080/adm
 **Note**: Login with demo username "tbrown" and password "password".   Use env "local-demo", app "testapp", ver "1.0.0".
 
 ## Install
-This application requires a Java 17+ JVM and standard library to run, plus a Java EE 8+ application server (developed with Wildfly).
+This application requires a Java 17+ JVM and standard library to run, plus a Jakarta EE 10 application server (developed with Wildfly).
 
 1. Install service [dependencies](https://github.com/JeffersonLab/adm/blob/main/deps.yaml)
-2. Download [Wildfly 26.1.3](https://www.wildfly.org/downloads/)
+2. Download [Wildfly 37.0.1](https://www.wildfly.org/downloads/)
 3. [Configure](https://github.com/JeffersonLab/adm#configure) Wildfly and start it
 4. Download [adm.war](https://github.com/JeffersonLab/workmap/releases) and deploy it to Wildfly
 5. Navigate your web browser to [localhost:8080/adm](http://localhost:8080/adm)
