@@ -1,11 +1,11 @@
 package org.jlab.adm.business.session;
 
+import jakarta.annotation.security.PermitAll;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.security.PermitAll;
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
 
 public abstract class AbstractFacade<T> {
   private final Class<T> entityClass;

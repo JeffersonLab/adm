@@ -1,10 +1,10 @@
 package org.jlab.adm.persistence.entity;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(schema = "ADM_OWNER", name = "DEPLOY_JOB")
