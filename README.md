@@ -63,7 +63,7 @@ public and private key pair for the Wildfly user via `ssh-keygen` and then add t
 file of each remote user account needed for deployments.   It's also possible to use Kerberos and keytabs instead.
 
 ### Database
-The application requires an Oracle 18+ database with the following [schema](https://github.com/JeffersonLab/adm/tree/main/container/oracle/initdb.d) installed.   The application server hosting the app must also be configured with a JNDI datasource.
+The application requires an Oracle 19+ database with the following [schema](https://github.com/JeffersonLab/adm/tree/main/container/oracle/initdb.d) installed.   The application server hosting the app must also be configured with a JNDI datasource.
 
 ## Build
 This project is built with [Java 21](https://adoptium.net/) (compiled to Java 17 bytecode), and uses the [Gradle 9](https://gradle.org/) build tool to automatically download dependencies and build the project from source:
