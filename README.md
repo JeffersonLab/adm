@@ -106,10 +106,10 @@ The deploy to JLab's acctest is handled automatically via the release workflow.
 At JLab this app is found at [ace.jlab.org/adm](https://ace.jlab.org/adm) and internally at [acctest.acc.jlab.org/adm](https://acctest.acc.jlab.org/adm).  However, those servers are proxies for `wildfly1.acc.jlab.org` and `wildflytest1.acc.jlab.org` respectively.   A [deploy script](https://github.com/JeffersonLab/wildfly/blob/main/scripts/deploy.sh) is provided on each server to automate wget and deploy.  Example:
 
 ```
-/root/setup/deploy.sh adm v1.2.3
+/opt/wildfly/cd/deploy.sh adm v1.2.3
 ```
 
-**JLab Internal Docs**:  [InstallGuideWildflyRHEL9](https://accwiki.acc.jlab.org/do/view/SysAdmin/InstallGuideWildflyRHEL9)
+**JLab Internal Docs**:  [RHEL9 Wildfly](https://acgdocs.acc.jlab.org/en/ace/builds/rhel9-wildfly)
 
 ## See Also
 - [JLab ACE management-app list](https://github.com/search?q=org%3Ajeffersonlab+topic%3Aace+topic%3Amanagement-app&type=repositories)
