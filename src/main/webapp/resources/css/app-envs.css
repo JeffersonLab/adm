@@ -1,3 +1,6 @@
 #row-form input {
     width: 350px;
 }
+table td {
+    word-break: break-word;
+}
