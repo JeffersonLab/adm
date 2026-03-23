@@ -58,9 +58,14 @@ jlab.addRow = function() {
     });
 };
 jlab.editRow = function(removeSync) {
-    var appId = $(".editable-row-table tr.selected-row").attr("data-id"),
-        name = $("#row-name").val(),
-        docUrl = $("#row-url").val(),
+    var appEnvId = $(".editable-row-table tr.selected-row").attr("data-id"),
+        appName = $("#row-app-name").val(),
+        envName = $("#row-env-name").val(),
+        requestUsername = $("#row-request-username").val(),
+        deployUsername = $("#row-deploy-username").val(),
+        deployHostname = $("#row-deploy-hostname").val(),
+        deployPort = $("#row-deploy-port").val(),
+        deployCommand = $("#row-deploy-command").val(),
         reloading = false;
 
     $(".dialog-submit-button")
@@ -74,9 +79,14 @@ jlab.editRow = function(removeSync) {
         url: jlab.contextPath + "/inventory/ajax/edit-app-env",
         type: "POST",
         data: {
-            appId: appId,
-            name: name,
-            docUrl: docUrl,
+            appEnvId: appEnvId,
+            appName: appName,
+            envName: envName,
+            requestUsername: requestUsername,
+            deployUsername: deployUsername,
+            deployHostname: deployHostname,
+            deployPort: deployPort,
+            deployCommand: deployCommand
         },
         dataType: "json"
     });
@@ -91,7 +101,7 @@ jlab.editRow = function(removeSync) {
     });
 
     request.fail(function(xhr, textStatus) {
-        window.console && console.log('Unable to edit app; Text Status: ' + textStatus + ', Ready State: ' + xhr.readyState + ', HTTP Status Code: ' + xhr.status);
+        window.console && console.log('Unable to edit app env; Text Status: ' + textStatus + ', Ready State: ' + xhr.readyState + ', HTTP Status Code: ' + xhr.status);
         alert('Unable to Save: Server unavailable or unresponsive');
     });
 

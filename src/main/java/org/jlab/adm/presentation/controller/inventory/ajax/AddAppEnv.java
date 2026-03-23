@@ -53,7 +53,7 @@ public class AddAppEnv extends HttpServlet {
           deployHostname,
           deployPort,
           deployCommand);
-    } catch(NumberFormatException e) {
+    } catch (NumberFormatException e) {
       stat = "fail";
       error = "port must be a positive integer";
     } catch (UserFriendlyException e) {
