@@ -22,21 +22,21 @@
                         <ul class="key-value-list">
                             <li>
                                 <div class="li-key">
-                                    <label for="env-name">Env Name</label>
-                                </div>
-                                <div class="li-value">
-                                    <input id="env-name"
-                                           name="envName" value="${fn:escapeXml(param.envName)}"/>
-                                    <div>(use * as wildcard)</div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="li-key">
                                     <label for="app-name">App Name</label>
                                 </div>
                                 <div class="li-value">
                                     <input id="app-name"
                                            name="appName" value="${fn:escapeXml(param.appName)}"/>
+                                    <div>(use * as wildcard)</div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="li-key">
+                                    <label for="env-name">Env Name</label>
+                                </div>
+                                <div class="li-value">
+                                    <input id="env-name"
+                                           name="envName" value="${fn:escapeXml(param.envName)}"/>
                                     <div>(use * as wildcard)</div>
                                 </div>
                             </li>
