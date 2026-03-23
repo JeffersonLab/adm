@@ -41,3 +41,7 @@ $(document).on("click", "#deploy-submit", function () {
 
     return false;
 });
+$(document).on("change", ".change-submit", function () {
+    let formId = $(this).attr("form");
+    document.getElementById(formId).submit();
+});

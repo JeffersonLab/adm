@@ -6,6 +6,7 @@ import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -190,5 +191,68 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
     env.setDeployCommand(deployCommand);
 
     edit(env);
+  }
+
+  @PermitAll
+  public List<AppEnv> filterList(String envName, String appName, int offset, int max) {
+    CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
+    CriteriaQuery<AppEnv> cq = cb.createQuery(AppEnv.class);
+    Root<AppEnv> root = cq.from(AppEnv.class);
+    cq.select(root);
+
+    List<Predicate> filters = getFilters(cb, cq, root, envName, appName);
+
+    if (!filters.isEmpty()) {
+      cq.where(cb.and(filters.toArray(new Predicate[] {})));
+    }
+
+    List<Order> orders = new ArrayList<>();
+    Path<String> p0 = root.get("name");
+    Order o0 = cb.asc(p0);
+    orders.add(o0);
+    cq.orderBy(orders);
+    return getEntityManager()
+        .createQuery(cq)
+        .setFirstResult(offset)
+        .setMaxResults(max)
+        .getResultList();
+  }
+
+  private List<Predicate> getFilters(
+      CriteriaBuilder cb,
+      CriteriaQuery<? extends Object> cq,
+      Root<AppEnv> root,
+      String envName,
+      String appName) {
+    List<Predicate> filters = new ArrayList<>();
+
+    if (envName != null && !envName.isEmpty()) {
+      envName = envName.replaceAll("\\*", "%");
+      filters.add(cb.like(cb.lower(root.get("name")), appName.toLowerCase()));
+    }
+
+    if (appName != null && !appName.isEmpty()) {
+      appName = appName.replaceAll("\\*", "%");
+      filters.add(cb.like(cb.lower(root.get("app").get("name")), appName.toLowerCase()));
+    }
+
+    return filters;
+  }
+
+  @PermitAll
+  public long countList(String envName, String appName) {
+    CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
+    CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+    Root<AppEnv> root = cq.from(AppEnv.class);
+
+    List<Predicate> filters = getFilters(cb, cq, root, envName, appName);
+
+    if (!filters.isEmpty()) {
+      cq.where(cb.and(filters.toArray(new Predicate[] {})));
+    }
+
+    cq.select(cb.count(root));
+    TypedQuery<Long> q = getEntityManager().createQuery(cq);
+    return q.getSingleResult();
   }
 }

@@ -14,7 +14,11 @@
     </jsp:attribute>
     <jsp:body>
         <section>
+            <form id="app-envs-form" class="filter-form" method="get" action="app-envs">
+                <input type="hidden" class="offset-input" name="offset" value="0"/>
+            </form>
             <h2 id="page-header-title"><c:out value="${title}"/></h2>
+            <div class="message-box"><c:out value="${selectionMessage}"/></div>
             <c:set var="readonly" value="${!pageContext.request.isUserInRole('adm-admin')}"/>
             <c:if test="${not readonly}">
                 <s:editable-row-table-controls>
@@ -64,6 +68,19 @@
                     </c:forEach>
                 </tbody>
             </table>
+            <button class="previous-button" type="button" data-offset="${paginator.previousOffset}"
+                    value="Previous"${paginator.previous ? '' : ' disabled="disabled"'}>Previous
+            </button>
+            <button class="next-button" type="button" data-offset="${paginator.nextOffset}"
+                    value="Next"${paginator.next ? '' : ' disabled="disabled"'}>Next
+            </button>
+            <div class="max-select">
+                <label for="max-select">Max Per Page</label>
+                <select id="max-select" name="max" form="app-envs-form" class="change-submit">
+                    <option value="10"${param.max eq 10 ? ' selected="selected"' : ''}>10</option>
+                    <option value="100"${param.max eq 100 ? ' selected="selected"' : ''}>100</option>
+                </select>
+            </div>
         </section>
         <s:editable-row-table-dialog>
             <section>
