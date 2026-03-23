@@ -14,10 +14,50 @@
     </jsp:attribute>
     <jsp:body>
         <section>
+            <s:filter-flyout-widget clearButton="true">
             <form id="app-envs-form" class="filter-form" method="get" action="app-envs">
+                <div class="filter-form-panel">
+                    <fieldset>
+                        <legend>Filter</legend>
+                        <ul class="key-value-list">
+                            <li>
+                                <div class="li-key">
+                                    <label for="env-name">Env Name</label>
+                                </div>
+                                <div class="li-value">
+                                    <input id="env-name"
+                                           name="envName" value="${fn:escapeXml(param.envName)}"/>
+                                    <div>(use * as wildcard)</div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="li-key">
+                                    <label for="app-name">App Name</label>
+                                </div>
+                                <div class="li-value">
+                                    <input id="app-name"
+                                           name="appName" value="${fn:escapeXml(param.appName)}"/>
+                                    <div>(use * as wildcard)</div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="li-key">
+                                    <label for="hostname">Deploy Hostname</label>
+                                </div>
+                                <div class="li-value">
+                                    <input id="hostname"
+                                           name="hostname" value="${fn:escapeXml(param.hostname)}"/>
+                                    <div>(use * as wildcard)</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </fieldset>
+                </div>
                 <input type="hidden" class="offset-input" name="offset" value="0"/>
+                <input class="filter-form-submit-button" type="submit" value="Apply"/>
             </form>
-            <h2 id="page-header-title"><c:out value="${title}"/></h2>
+            </s:filter-flyout-widget>
+            <h2 class="page-header-title"><c:out value="${title}"/></h2>
             <div class="message-box"><c:out value="${selectionMessage}"/></div>
             <c:set var="readonly" value="${!pageContext.request.isUserInRole('adm-admin')}"/>
             <c:if test="${not readonly}">

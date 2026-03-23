@@ -26,6 +26,9 @@ public class AppEnvs extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
+    String envName = request.getParameter("envName");
+    String appName = request.getParameter("appName");
+    String hostname = request.getParameter("hostname");
     int offset = ParamUtil.convertAndValidateNonNegativeInt(request, "offset", 0);
     Integer maxPerPage = ParamConverter.convertInteger(request, "max");
 
@@ -33,12 +36,13 @@ public class AppEnvs extends HttpServlet {
       maxPerPage = 10;
     }
 
-    List<AppEnv> appenvList = appEnvFacade.filterList(null, null, offset, maxPerPage);
-    long totalRecords = appEnvFacade.countList(null, null);
+    List<AppEnv> appenvList =
+        appEnvFacade.filterList(envName, appName, hostname, offset, maxPerPage);
+    long totalRecords = appEnvFacade.countList(envName, appName, hostname);
 
     Paginator paginator = new Paginator(totalRecords, offset, maxPerPage);
 
-    String selectionMessage = createSelectionMessage(paginator, null);
+    String selectionMessage = createSelectionMessage(paginator, envName, appName, hostname);
 
     request.setAttribute("paginator", paginator);
     request.setAttribute("selectionMessage", selectionMessage);
@@ -49,15 +53,24 @@ public class AppEnvs extends HttpServlet {
         .forward(request, response);
   }
 
-  private String createSelectionMessage(Paginator paginator, String appName) {
+  private String createSelectionMessage(
+      Paginator paginator, String envName, String appName, String hostname) {
     DecimalFormat formatter = new DecimalFormat("###,###");
 
     String selectionMessage = "All App Envs ";
 
     List<String> filters = new ArrayList<>();
 
+    if (envName != null && !envName.isBlank()) {
+      filters.add("Env Name \"" + envName + "\"");
+    }
+
     if (appName != null && !appName.isBlank()) {
-      filters.add("Name \"" + appName + "\"");
+      filters.add("App Name \"" + appName + "\"");
+    }
+
+    if (hostname != null && !hostname.isBlank()) {
+      filters.add("Hostname \"" + hostname + "\"");
     }
 
     if (!filters.isEmpty()) {

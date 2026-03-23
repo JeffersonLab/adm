@@ -194,13 +194,14 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
   }
 
   @PermitAll
-  public List<AppEnv> filterList(String envName, String appName, int offset, int max) {
+  public List<AppEnv> filterList(
+      String envName, String appName, String hostname, int offset, int max) {
     CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
     CriteriaQuery<AppEnv> cq = cb.createQuery(AppEnv.class);
     Root<AppEnv> root = cq.from(AppEnv.class);
     cq.select(root);
 
-    List<Predicate> filters = getFilters(cb, cq, root, envName, appName);
+    List<Predicate> filters = getFilters(cb, cq, root, envName, appName, hostname);
 
     if (!filters.isEmpty()) {
       cq.where(cb.and(filters.toArray(new Predicate[] {})));
@@ -223,12 +224,13 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
       CriteriaQuery<? extends Object> cq,
       Root<AppEnv> root,
       String envName,
-      String appName) {
+      String appName,
+      String hostname) {
     List<Predicate> filters = new ArrayList<>();
 
     if (envName != null && !envName.isEmpty()) {
       envName = envName.replaceAll("\\*", "%");
-      filters.add(cb.like(cb.lower(root.get("name")), appName.toLowerCase()));
+      filters.add(cb.like(cb.lower(root.get("name")), envName.toLowerCase()));
     }
 
     if (appName != null && !appName.isEmpty()) {
@@ -236,16 +238,21 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
       filters.add(cb.like(cb.lower(root.get("app").get("name")), appName.toLowerCase()));
     }
 
+    if (hostname != null && !hostname.isEmpty()) {
+      hostname = hostname.replaceAll("\\*", "%");
+      filters.add(cb.like(cb.lower(root.get("hostname")), hostname.toLowerCase()));
+    }
+
     return filters;
   }
 
   @PermitAll
-  public long countList(String envName, String appName) {
+  public long countList(String envName, String appName, String hostname) {
     CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
     CriteriaQuery<Long> cq = cb.createQuery(Long.class);
     Root<AppEnv> root = cq.from(AppEnv.class);
 
-    List<Predicate> filters = getFilters(cb, cq, root, envName, appName);
+    List<Predicate> filters = getFilters(cb, cq, root, envName, appName, hostname);
 
     if (!filters.isEmpty()) {
       cq.where(cb.and(filters.toArray(new Predicate[] {})));

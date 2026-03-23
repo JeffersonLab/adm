@@ -184,6 +184,9 @@ $(document).on("click", "#remove-row-button", function() {
     }
 });
 $(document).on("click", ".default-clear-panel", function () {
+    $("#env-name").val('');
+    $("#app-name").val('');
+    $("#hostname").val('');
     return false;
 });
 $(function(){
