@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Objects;
 
 @Entity
@@ -13,10 +13,12 @@ public class AppEnv implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @Id
+  @SequenceGenerator(name = "AppEnvId", sequenceName = "APP_ENV_ID", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "AppEnvId")
   @Basic(optional = false)
   @NotNull
   @Column(name = "APP_ENV_ID", nullable = false, precision = 22, scale = 0)
-  private BigDecimal appEnvId;
+  private BigInteger appEnvId;
 
   @NotNull
   @JoinColumn(name = "APP_ID", referencedColumnName = "APP_ID", nullable = false)
@@ -58,11 +60,30 @@ public class AppEnv implements Serializable {
   @Column(name = "DEPLOY_COMMAND", nullable = false, length = 128)
   private String deployCommand;
 
-  public BigDecimal getAppEnvId() {
+  public AppEnv() {}
+
+  public AppEnv(
+      App app,
+      String envName,
+      String requestUsername,
+      String deployUsername,
+      String deployHostname,
+      Integer deployPort,
+      String deployCommand) {
+    this.app = app;
+    this.name = envName;
+    this.requestServiceUsername = requestUsername;
+    this.runServiceUsername = deployUsername;
+    this.hostname = deployHostname;
+    this.port = deployPort;
+    this.deployCommand = deployCommand;
+  }
+
+  public BigInteger getAppEnvId() {
     return appEnvId;
   }
 
-  public void setAppEnvId(BigDecimal envId) {
+  public void setAppEnvId(BigInteger envId) {
     this.appEnvId = envId;
   }
 
