@@ -22,7 +22,7 @@ import org.jlab.smoothness.presentation.util.ParamConverter;
 
 @WebServlet(
     name = "EditApp",
-    urlPatterns = {"/ajax/edit-app"})
+    urlPatterns = {"/inventory/ajax/edit-app"})
 public class EditApp extends HttpServlet {
 
   private static final Logger logger = Logger.getLogger(EditApp.class.getName());
@@ -41,7 +41,7 @@ public class EditApp extends HttpServlet {
     try {
       BigInteger appId = ParamConverter.convertBigInteger(request, "appId");
       name = request.getParameter("name");
-      String docUrl = request.getParameter("homeUrl");
+      String docUrl = request.getParameter("docUrl");
 
       appService.editApp(
           appId,

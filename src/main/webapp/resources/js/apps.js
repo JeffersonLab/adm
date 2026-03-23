@@ -1,7 +1,7 @@
 var jlab = jlab || {};
 jlab.editableRowTable = jlab.editableRowTable || {};
 jlab.editableRowTable.entity = 'App';
-jlab.editableRowTable.dialog.width = 450;
+jlab.editableRowTable.dialog.width = 500;
 jlab.editableRowTable.dialog.height = 350;
 jlab.addRow = function() {
     var name = $("#row-name").val(),
@@ -16,7 +16,7 @@ jlab.addRow = function() {
     $(".ui-dialog-titlebar button").attr("disabled", "disabled");
 
     var request = jQuery.ajax({
-        url: jlab.contextPath + "/ajax/add-app",
+        url: jlab.contextPath + "/inventory/ajax/add-app",
         type: "POST",
         data: {
             name: name,
@@ -61,7 +61,7 @@ jlab.editRow = function(removeSync) {
     $(".ui-dialog-titlebar button").attr("disabled", "disabled");
 
     var request = jQuery.ajax({
-        url: jlab.contextPath + "/ajax/edit-app",
+        url: jlab.contextPath + "/inventory/ajax/edit-app",
         type: "POST",
         data: {
             appId: appId,
@@ -105,7 +105,7 @@ jlab.removeRow = function() {
         .empty().append('<div class="button-indicator"></div>');
 
     var request = jQuery.ajax({
-        url: jlab.contextPath + "/ajax/remove-app",
+        url: jlab.contextPath + "/inventory/ajax/remove-app",
         type: "POST",
         data: {
             appId: id

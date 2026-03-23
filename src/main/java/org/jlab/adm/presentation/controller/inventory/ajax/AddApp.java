@@ -20,7 +20,7 @@ import org.jlab.smoothness.business.util.ExceptionUtil;
 
 @WebServlet(
     name = "AddApp",
-    urlPatterns = {"/ajax/add-app"})
+    urlPatterns = {"/inventory/ajax/add-app"})
 public class AddApp extends HttpServlet {
 
   private static final Logger logger = Logger.getLogger(AddApp.class.getName());
@@ -38,7 +38,7 @@ public class AddApp extends HttpServlet {
 
     try {
       name = request.getParameter("name");
-      String docUrl = request.getParameter("homeUrl");
+      String docUrl = request.getParameter("docUrl");
 
       appService.addApp(
           name,

@@ -22,7 +22,7 @@ import org.jlab.smoothness.presentation.util.ParamConverter;
 
 @WebServlet(
     name = "RemoveApp",
-    urlPatterns = {"/ajax/remove-app"})
+    urlPatterns = {"/inventory/ajax/remove-app"})
 public class RemoveApp extends HttpServlet {
 
   private static final Logger logger = Logger.getLogger(RemoveApp.class.getName());
