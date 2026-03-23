@@ -14,7 +14,6 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.jlab.adm.business.session.AppFacade;
 import org.jlab.smoothness.business.exception.UserFriendlyException;
 import org.jlab.smoothness.business.util.ExceptionUtil;
@@ -27,8 +26,7 @@ public class EditApp extends HttpServlet {
 
   private static final Logger logger = Logger.getLogger(EditApp.class.getName());
 
-  @EJB
-  AppFacade appService;
+  @EJB AppFacade appService;
 
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -43,10 +41,7 @@ public class EditApp extends HttpServlet {
       name = request.getParameter("name");
       String docUrl = request.getParameter("docUrl");
 
-      appService.editApp(
-          appId,
-          name,
-          docUrl);
+      appService.editApp(appId, name, docUrl);
     } catch (UserFriendlyException e) {
       stat = "fail";
       error = "Unable to edit App: " + e.getUserMessage();

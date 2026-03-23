@@ -11,22 +11,21 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.math.BigInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.jlab.adm.business.session.AppFacade;
+import org.jlab.adm.business.session.AppEnvFacade;
 import org.jlab.smoothness.business.exception.UserFriendlyException;
 import org.jlab.smoothness.business.util.ExceptionUtil;
 import org.jlab.smoothness.presentation.util.ParamConverter;
 
 @WebServlet(
-    name = "RemoveApp",
-    urlPatterns = {"/inventory/ajax/remove-app"})
-public class RemoveApp extends HttpServlet {
+    name = "AddAppEnv",
+    urlPatterns = {"/inventory/ajax/add-app-env"})
+public class AddAppEnv extends HttpServlet {
 
-  private static final Logger logger = Logger.getLogger(RemoveApp.class.getName());
+  private static final Logger logger = Logger.getLogger(AddAppEnv.class.getName());
 
-  @EJB AppFacade appService;
+  @EJB AppEnvFacade appEnvService;
 
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -34,25 +33,42 @@ public class RemoveApp extends HttpServlet {
 
     String stat = "ok";
     String error = null;
-    String name = null;
+    String appName = null;
+    String envName = null;
 
     try {
-      BigInteger appId = ParamConverter.convertBigInteger(request, "appId");
+      appName = request.getParameter("appName");
+      envName = request.getParameter("envName");
+      String requestUsername = request.getParameter("requestUsername");
+      String deployUsername = request.getParameter("deployUsername");
+      String deployHostname = request.getParameter("deployHostname");
+      Integer deployPort = ParamConverter.convertInteger(request, "deployPort");
+      String deployCommand = request.getParameter("deployCommand");
 
-      appService.removeSoftware(appId);
+      appEnvService.addAppEnv(
+          appName,
+          envName,
+          requestUsername,
+          deployUsername,
+          deployHostname,
+          deployPort,
+          deployCommand);
+    } catch(NumberFormatException e) {
+      stat = "fail";
+      error = "port must be a positive integer";
     } catch (UserFriendlyException e) {
       stat = "fail";
-      error = "Unable to remove App: " + e.getUserMessage();
+      error = "Unable to add App: " + e.getUserMessage();
     } catch (EJBAccessException e) {
       stat = "fail";
-      error = "Unable to remove App: Not authenticated / authorized (do you need to re-login?)";
+      error = "Unable to add App: Not authenticated / authorized (do you need to re-login?)";
     } catch (RuntimeException e) {
       stat = "fail";
-      error = "Unable to remove App";
-      logger.log(Level.SEVERE, "Unable to remove App", e);
+      error = "Unable to add App";
+      logger.log(Level.SEVERE, "Unable to add App", e);
       Throwable rootCause = ExceptionUtil.getRootCause(e);
       if ("OracleDatabaseException".equals(rootCause.getClass().getSimpleName())) {
-        error = "Oracle Database Exception - make sure name doesn't already exist: " + name;
+        error = "Oracle Database Exception - make sure name doesn't already exist: " + appName;
       }
     }
 

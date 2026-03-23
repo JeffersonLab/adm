@@ -54,7 +54,7 @@ public class App implements Serializable {
     this.docUrl = docUrl;
   }
 
-  public App(){}
+  public App() {}
 
   public App(String name, String docUrl) {
     this.name = name;

@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.jlab.adm.business.session.AppFacade;
 import org.jlab.smoothness.business.exception.UserFriendlyException;
 import org.jlab.smoothness.business.util.ExceptionUtil;
@@ -25,8 +24,7 @@ public class AddApp extends HttpServlet {
 
   private static final Logger logger = Logger.getLogger(AddApp.class.getName());
 
-  @EJB
-  AppFacade appService;
+  @EJB AppFacade appService;
 
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -40,9 +38,7 @@ public class AddApp extends HttpServlet {
       name = request.getParameter("name");
       String docUrl = request.getParameter("docUrl");
 
-      appService.addApp(
-          name,
-          docUrl);
+      appService.addApp(name, docUrl);
     } catch (UserFriendlyException e) {
       stat = "fail";
       error = "Unable to add App: " + e.getUserMessage();

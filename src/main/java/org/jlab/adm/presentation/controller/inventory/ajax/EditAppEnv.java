@@ -20,11 +20,11 @@ import org.jlab.smoothness.business.util.ExceptionUtil;
 import org.jlab.smoothness.presentation.util.ParamConverter;
 
 @WebServlet(
-    name = "RemoveApp",
-    urlPatterns = {"/inventory/ajax/remove-app"})
-public class RemoveApp extends HttpServlet {
+    name = "EditAppEnv",
+    urlPatterns = {"/inventory/ajax/edit-app-env"})
+public class EditAppEnv extends HttpServlet {
 
-  private static final Logger logger = Logger.getLogger(RemoveApp.class.getName());
+  private static final Logger logger = Logger.getLogger(EditAppEnv.class.getName());
 
   @EJB AppFacade appService;
 
@@ -38,18 +38,20 @@ public class RemoveApp extends HttpServlet {
 
     try {
       BigInteger appId = ParamConverter.convertBigInteger(request, "appId");
+      name = request.getParameter("name");
+      String docUrl = request.getParameter("docUrl");
 
-      appService.removeSoftware(appId);
+      appService.editApp(appId, name, docUrl);
     } catch (UserFriendlyException e) {
       stat = "fail";
-      error = "Unable to remove App: " + e.getUserMessage();
+      error = "Unable to edit App: " + e.getUserMessage();
     } catch (EJBAccessException e) {
       stat = "fail";
-      error = "Unable to remove App: Not authenticated / authorized (do you need to re-login?)";
+      error = "Unable to edit App: Not authenticated / authorized (do you need to re-login?)";
     } catch (RuntimeException e) {
       stat = "fail";
-      error = "Unable to remove App";
-      logger.log(Level.SEVERE, "Unable to remove App", e);
+      error = "Unable to edit App";
+      logger.log(Level.SEVERE, "Unable to edit Software", e);
       Throwable rootCause = ExceptionUtil.getRootCause(e);
       if ("OracleDatabaseException".equals(rootCause.getClass().getSimpleName())) {
         error = "Oracle Database Exception - make sure name doesn't already exist: " + name;

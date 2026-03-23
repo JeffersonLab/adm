@@ -14,19 +14,19 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.jlab.adm.business.session.AppFacade;
+import org.jlab.adm.business.session.AppEnvFacade;
 import org.jlab.smoothness.business.exception.UserFriendlyException;
 import org.jlab.smoothness.business.util.ExceptionUtil;
 import org.jlab.smoothness.presentation.util.ParamConverter;
 
 @WebServlet(
-    name = "RemoveApp",
-    urlPatterns = {"/inventory/ajax/remove-app"})
-public class RemoveApp extends HttpServlet {
+    name = "RemoveAppEnv",
+    urlPatterns = {"/inventory/ajax/remove-app-env"})
+public class RemoveAppEnv extends HttpServlet {
 
-  private static final Logger logger = Logger.getLogger(RemoveApp.class.getName());
+  private static final Logger logger = Logger.getLogger(RemoveAppEnv.class.getName());
 
-  @EJB AppFacade appService;
+  @EJB AppEnvFacade appEnvService;
 
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -37,9 +37,9 @@ public class RemoveApp extends HttpServlet {
     String name = null;
 
     try {
-      BigInteger appId = ParamConverter.convertBigInteger(request, "appId");
+      BigInteger appEnvId = ParamConverter.convertBigInteger(request, "appEnvId");
 
-      appService.removeSoftware(appId);
+      appEnvService.removeAppEnv(appEnvId);
     } catch (UserFriendlyException e) {
       stat = "fail";
       error = "Unable to remove App: " + e.getUserMessage();
