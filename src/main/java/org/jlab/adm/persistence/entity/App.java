@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Objects;
 
 @Entity
@@ -13,10 +13,12 @@ public class App implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @Id
+  @SequenceGenerator(name = "AppId", sequenceName = "APP_ID", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "AppId")
   @Basic(optional = false)
   @NotNull
   @Column(name = "APP_ID", nullable = false, precision = 22, scale = 0)
-  private BigDecimal appId;
+  private BigInteger appId;
 
   @Basic(optional = false)
   @NotNull
@@ -28,11 +30,11 @@ public class App implements Serializable {
   @Column(name = "DOC_URL", nullable = true, length = 512)
   private String docUrl;
 
-  public BigDecimal getAppId() {
+  public BigInteger getAppId() {
     return appId;
   }
 
-  public void setAppId(BigDecimal appId) {
+  public void setAppId(BigInteger appId) {
     this.appId = appId;
   }
 
@@ -49,6 +51,13 @@ public class App implements Serializable {
   }
 
   public void setDocUrl(String docUrl) {
+    this.docUrl = docUrl;
+  }
+
+  public App(){}
+
+  public App(String name, String docUrl) {
+    this.name = name;
     this.docUrl = docUrl;
   }
 
