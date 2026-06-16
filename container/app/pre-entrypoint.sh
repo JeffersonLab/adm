@@ -11,17 +11,17 @@
 ##
 
 if [ -n "${RSA_PUBLIC_KEY}" ]; then
-  echo "Populating /opt/jboss/.ssh/id_rsa.pub with the value from RSA_PUBLIC_KEY env variable ..."
-  echo "${RSA_PUBLIC_KEY}" > /opt/jboss/.ssh/id_rsa.pub
-  chown jboss:jboss /opt/jboss/.ssh/id_rsa.pub
-  chmod 600 /opt/jboss/.ssh/id_rsa.pub
+  echo "Populating /home/dev/.ssh/id_rsa.pub with the value from RSA_PUBLIC_KEY env variable ..."
+  echo "${RSA_PUBLIC_KEY}" > /home/dev/.ssh/id_rsa.pub
+  chown dev /home/dev/.ssh/id_rsa.pub
+  chmod 600 /home/dev/.ssh/id_rsa.pub
 fi
 
 if [ -n "${RSA_PRIVATE_KEY}" ]; then
-  echo "Populating /opt/jboss/.ssh/id_rsa with the value from RSA_PRIVATE_KEY env variable ..."
-  echo "${RSA_PRIVATE_KEY}" > /opt/jboss/.ssh/id_rsa
-  chown jboss:jboss /opt/jboss/.ssh/id_rsa
-  chmod 600 /opt/jboss/.ssh/id_rsa
+  echo "Populating /home/dev/.ssh/id_rsa with the value from RSA_PRIVATE_KEY env variable ..."
+  echo "${RSA_PRIVATE_KEY}" > /home/dev/.ssh/id_rsa
+  chown dev /home/dev/.ssh/id_rsa
+  chmod 600 /home/dev/.ssh/id_rsa
 fi
 
 # Now call the upstream jeffersonlab/wildfly entrypoint
