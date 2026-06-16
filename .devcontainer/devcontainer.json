@@ -1,5 +1,18 @@
 {
   "dockerComposeFile": "dev.yaml",
   "service": "adm",
-  "workspaceFolder": "/adm"
+  "workspaceFolder": "/home/dev/adm",
+  "runServices": [
+    "dev",
+    "oracle",
+    "keycloak",
+    "sshd"
+  ],
+  "remoteUser": "dev",
+  "updateRemoteUserUID": false,
+  "customizations": {
+    "jetbrains": {
+      "backend": "IntelliJ"
+    }
+  }
 }

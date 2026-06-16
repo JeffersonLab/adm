@@ -3,22 +3,21 @@ services:
     extends:
       file: ../compose.yaml
       service: oracle
+    container_name: adm-oracle-devc
 
   keycloak:
     extends:
       file: ../compose.yaml
       service: keycloak
+    container_name: adm-keycloak-devc
 
   sshd:
     extends:
       file: ../compose.yaml
       service: sshd
+    container_name: adm-sshd-devc
 
   adm:
-    build:
-      context: ../.
-      dockerfile: Dockerfile
-      target: dev
-    extends:
-      file: ../compose.yaml
-      service: adm
+    image: jeffersonlab/adm:latest
+    hostname: dev
+    container_name: adm-dev-devc
