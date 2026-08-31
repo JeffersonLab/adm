@@ -17,7 +17,7 @@ A [Jakarta EE 10](https://en.wikipedia.org/wiki/Jakarta_EE) web application for 
 ---
 
 ## Overview
-The application deployment manager app aids automated app deployment by providing an HTTP endpoint for executing 
+The automated deployment manager app aids programmatic app deployment by providing an HTTP endpoint for executing 
 curated remote deployment commands securely.
 
 ## Quick Start with Compose

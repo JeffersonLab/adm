@@ -8,7 +8,7 @@
     </welcome-file-list>
     <context-param>
         <param-name>appName</param-name>
-        <param-value>Application Deployment Manager</param-value>
+        <param-value>Automated Deployment Manager</param-value>
     </context-param>
     <context-param>
         <param-name>appShortName</param-name>
