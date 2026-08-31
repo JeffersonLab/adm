@@ -208,9 +208,12 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
     }
 
     List<Order> orders = new ArrayList<>();
-    Path<String> p0 = root.get("name");
+    Path<String> p0 = root.get("app");
+    Path<String> p1 = root.get("name");
     Order o0 = cb.asc(p0);
     orders.add(o0);
+    Order o1 = cb.asc(p1);
+    orders.add(o1);
     cq.orderBy(orders);
     return getEntityManager()
         .createQuery(cq)
