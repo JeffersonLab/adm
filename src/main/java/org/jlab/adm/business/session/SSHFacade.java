@@ -11,9 +11,12 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.sshd.client.SshClient;
+import org.apache.sshd.client.channel.ChannelExec;
+import org.apache.sshd.client.channel.ClientChannelEvent;
 import org.apache.sshd.client.session.ClientSession;
 import org.jlab.adm.persistence.entity.AppEnv;
 import org.jlab.adm.persistence.entity.DeployJob;
@@ -27,6 +30,7 @@ public class SSHFacade {
 
   final Duration verifyTimeout = Duration.ofSeconds(5);
   final Duration authTimeout = Duration.ofSeconds(5);
+  final Duration openTimeout = Duration.ofSeconds(5);
 
   @EJB DeployJobFacade deployJobFacade;
 
@@ -64,9 +68,8 @@ public class SSHFacade {
         Level.INFO, "execute " + username + "@" + hostname + ":" + port + " \"" + command + "\"");
     SshClient client = SshClient.setUpDefaultClient();
 
-    int exitCode = 0;
-    String out;
-    String err;
+    ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    ByteArrayOutputStream stderr = new ByteArrayOutputStream();
 
     client.start();
 
@@ -74,22 +77,32 @@ public class SSHFacade {
         client.connect(username, hostname, port).verify(verifyTimeout).getSession()) {
       session.auth().verify(authTimeout);
 
-      try (ByteArrayOutputStream stdout = new ByteArrayOutputStream();
-          ByteArrayOutputStream stderr = new ByteArrayOutputStream()) {
+      // Use an exec channel instead of session.executeRemoteCommand, which throws if the exit code
+      // is not 0, losing the exit code (and our stdout/stderr) in the process
+      try (ChannelExec channel = session.createExecChannel(command)) {
+        channel.setOut(stdout);
+        channel.setErr(stderr);
+        channel.open().verify(openTimeout);
 
-        // Throws RemoteException if exitcode != 0
-        session.executeRemoteCommand(command, stdout, stderr, StandardCharsets.UTF_8);
+        // Wait as long as the command takes
+        channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), 0L);
 
-        out = stdout.toString(StandardCharsets.UTF_8);
-        err = stderr.toString(StandardCharsets.UTF_8);
-      } // try with resources automatically calls stdout/stderr .close()
-    } // try with resources automatically calls session.close()
+        Integer exitCode = channel.getExitStatus();
 
-    client.stop();
-    client.close();
+        job.setExitCode(exitCode);
 
-    job.setExitCode(exitCode);
-    job.setOut(out);
-    job.setErr(err);
+        if (exitCode == null) {
+          throw new IOException("No exit code received; exit signal: " + channel.getExitSignal());
+        }
+      } // try with resources automatically calls channel.close()
+      // try with resources automatically calls session.close()
+    } finally {
+      // Record output whatever happened, as it often explains a failure
+      job.setOut(stdout.toString(StandardCharsets.UTF_8));
+      job.setErr(stderr.toString(StandardCharsets.UTF_8));
+
+      client.stop();
+      client.close();
+    }
   }
 }
