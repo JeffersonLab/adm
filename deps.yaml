@@ -12,7 +12,7 @@ services:
       - ./container/oracle/initdb.d:/container-entrypoint-initdb.d
 
   keycloak:
-    image: jeffersonlab/keycloak:2.6.0
+    image: jeffersonlab/keycloak:3
     hostname: keycloak
     ports:
       - "127.0.0.1:${ADM_KEYCLOAK_PORT:-8081}:8080"
