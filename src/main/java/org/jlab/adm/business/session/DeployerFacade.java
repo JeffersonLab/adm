@@ -63,7 +63,7 @@ public class DeployerFacade {
         "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$";
     final Pattern p = Pattern.compile(regex);
 
-    if (!p.matcher(ver).matches()) {
+    if (ver == null || !p.matcher(ver).matches()) {
       throw new UserFriendlyException("Version string must be semver formatted");
     }
   }

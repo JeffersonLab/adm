@@ -16,6 +16,7 @@ import org.jlab.adm.persistence.entity.DeployJob;
 import org.jlab.smoothness.business.exception.UserFriendlyException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class DeployerFacadeTest {
@@ -87,8 +88,10 @@ class DeployerFacadeTest {
     assertEquals(version, started.get(0).getVersion());
   }
 
-  // The version is appended to the deploy command run in a shell, so anything else is rejected
+  // The version is appended to the deploy command run in a shell, so anything else is rejected.
+  // Null is a request without the ver parameter.
   @ParameterizedTest
+  @NullSource
   @ValueSource(
       strings = {
         "",
