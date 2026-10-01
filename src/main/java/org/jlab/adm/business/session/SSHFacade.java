@@ -4,14 +4,18 @@ import jakarta.annotation.security.PermitAll;
 import jakarta.ejb.Asynchronous;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
+import jakarta.ejb.TransactionAttribute;
+import jakarta.ejb.TransactionAttributeType;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.sshd.client.SshClient;
@@ -31,11 +35,16 @@ public class SSHFacade {
   final Duration verifyTimeout = Duration.ofSeconds(5);
   final Duration authTimeout = Duration.ofSeconds(5);
   final Duration openTimeout = Duration.ofSeconds(5);
+  // A deploy command can hang forever, such as on a prompt to accept a certificate
+  final Duration commandTimeout = Duration.ofMinutes(10);
 
   @EJB DeployJobFacade deployJobFacade;
 
+  // No transaction while the command runs, as it can outlast the transaction timeout;
+  // deployJobFacade.edit uses its own
   @Asynchronous
   @PermitAll
+  @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
   public void asyncExecuteRemoteCommand(DeployJob job) throws UserFriendlyException {
     try {
       executeRemoteCommand(job);
@@ -84,8 +93,13 @@ public class SSHFacade {
         channel.setErr(stderr);
         channel.open().verify(openTimeout);
 
-        // Wait as long as the command takes
-        channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), 0L);
+        Set<ClientChannelEvent> events =
+            channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), commandTimeout);
+
+        if (events.contains(ClientChannelEvent.TIMEOUT)) {
+          throw new SocketTimeoutException(
+              "Deploy command did not finish within " + commandTimeout.toSeconds() + " seconds");
+        }
 
         Integer exitCode = channel.getExitStatus();
 
