@@ -85,10 +85,12 @@ final class Adm {
 
     while (!ready && Instant.now().isBefore(end)) {
       try {
-        HttpResponse<String> response = get("/log", serviceAccountToken());
+        // The admin's password login works once Keycloak's setup scripts have all run
+        HttpResponse<String> response = get("/log", adminToken());
         ready = response.statusCode() == 200;
         problem = "GET /log returned " + response.statusCode();
-      } catch (IOException | RuntimeException e) {
+      } catch (IOException | RuntimeException | AssertionError e) {
+        // Such as a failed token request while Keycloak is still creating the realm
         problem = e.toString();
       }
 
