@@ -20,9 +20,9 @@ services:
   adm:
     hostname: adm
     ports:
-      - "${ADM_HTTPS_PORT:-8443}:8443"
-      - "${ADM_HTTP_PORT:-8080}:8080"
-      - "${ADM_MANAGEMENT_PORT:-9990}:9990"
+      - "127.0.0.1:${ADM_HTTPS_PORT:-8443}:8443"
+      - "127.0.0.1:${ADM_HTTP_PORT:-8080}:8080"
+      - "127.0.0.1:${ADM_MANAGEMENT_PORT:-9990}:9990"
     environment:
       # The browser reaches Keycloak and the app on the host's ports
       KEYCLOAK_FRONTEND_SERVER_URL: 'http://localhost:${ADM_KEYCLOAK_PORT:-8081}/auth'

@@ -38,7 +38,7 @@ http://localhost:8080/adm
 **Note**: Login with demo username "tbrown" and password "password".   Use env "local-demo", app "testapp", ver "1.0.0".
 
 ### Ports
-The containers publish these ports on the host.  If another project already uses some of them, or you run a second copy of adm, set other ports in a `.env` file next to `compose.yaml`, which Compose reads, or in the environment:
+The containers publish these ports on the host, listening only on its local address (127.0.0.1), so other computers can't reach the demo database, accounts, and management consoles.  To use them from another computer, forward them over SSH, such as `ssh -N -L 8443:localhost:8443 -L 8081:localhost:8081 <host>` for the app and Keycloak.  If another project already uses some of them, or you run a second copy of adm, set other ports in a `.env` file next to `compose.yaml`, which Compose reads, or in the environment:
 
 | Variable | Default | Port of |
 |---|---|---|
