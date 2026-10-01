@@ -36,8 +36,9 @@ public class SSHFacade {
   final Duration verifyTimeout = Duration.ofSeconds(5);
   final Duration authTimeout = Duration.ofSeconds(5);
   final Duration openTimeout = Duration.ofSeconds(5);
-  // A deploy command can hang forever, such as on a prompt to accept a certificate
-  final Duration commandTimeout = Duration.ofMinutes(10);
+  // A deploy command can hang forever, such as on a prompt to accept a certificate.
+  // Not final so tests can shorten it.
+  Duration commandTimeout = Duration.ofMinutes(10);
 
   @EJB DeployJobFacade deployJobFacade;
 
@@ -76,7 +77,7 @@ public class SSHFacade {
 
     LOGGER.log(
         Level.INFO, "execute " + username + "@" + hostname + ":" + port + " \"" + command + "\"");
-    SshClient client = SshClient.setUpDefaultClient();
+    SshClient client = createClient();
 
     ByteArrayOutputStream stdout = new ByteArrayOutputStream();
     ByteArrayOutputStream stderr = new ByteArrayOutputStream();
@@ -122,5 +123,10 @@ public class SSHFacade {
       client.stop();
       client.close();
     }
+  }
+
+  /** Tests override this to use their own key and server. */
+  SshClient createClient() {
+    return SshClient.setUpDefaultClient();
   }
 }

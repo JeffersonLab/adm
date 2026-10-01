@@ -93,6 +93,8 @@ The [server](https://github.com/JeffersonLab/wildfly/blob/main/scripts/server-se
 
 The user you use to run Wildfly needs to have an SSH public/private key pair (ssh-keygen) in the default location (~/.ssh).   The public key needs to be added to the `authorized_keys` file of user `testuser` in the container named "sshd".  This can be done by creating a file named `.env` in the root of the project containing the env name "TEST_USER_AUTHORIZED_KEY" with value being Wildfly user's public key.  This env will then be passed in via deps.yaml environment setting.
 
+The unit tests run with `gradlew build`, or alone with `gradlew test`.  They need no database, Wildfly, or containers: the SSH tests start their own in-process SSH server.
+
 ## Release
 1. Bump the version number in the VERSION file and commit and push to GitHub (using [Semantic Versioning](https://semver.org/)).
 2. The [CD](https://github.com/JeffersonLab/adm/blob/main/.github/workflows/cd.yaml) GitHub Action should run automatically invoking:
