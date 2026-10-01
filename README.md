@@ -95,6 +95,13 @@ The user you use to run Wildfly needs to have an SSH public/private key pair (ss
 
 The unit tests run with `gradlew build`, or alone with `gradlew test`.  They need no database, Wildfly, or containers: the SSH tests start their own in-process SSH server.
 
+The integration tests run against the app and its services in containers, built from source, and are not part of `gradlew build`:
+```
+docker compose -f build.yaml up -d --build
+gradlew integrationTest
+```
+They wait up to 5 minutes for the services to start (set `ADM_READY_TIMEOUT_SECONDS` to change that), then log in with the demo users and the `adm` client's service account, as CI deploys do.  They add their own app envs to deploy to, and remove them afterwards.  To test an app on other ports, set `ADM_URL` (default `https://localhost:8443/adm`) and `KEYCLOAK_URL` (default `http://localhost:8081/auth`).
+
 ## Release
 1. Bump the version number in the VERSION file and commit and push to GitHub (using [Semantic Versioning](https://semver.org/)).
 2. The [CD](https://github.com/JeffersonLab/adm/blob/main/.github/workflows/cd.yaml) GitHub Action should run automatically invoking:
