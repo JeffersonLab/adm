@@ -8,6 +8,7 @@ import jakarta.ejb.TransactionAttribute;
 import jakarta.ejb.TransactionAttributeType;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.SocketTimeoutException;
@@ -91,6 +92,9 @@ public class SSHFacade {
       try (ChannelExec channel = session.createExecChannel(command)) {
         channel.setOut(stdout);
         channel.setErr(stderr);
+        // No input, so a command that asks for some, such as a prompt to accept a certificate,
+        // fails at once instead of waiting until it times out
+        channel.setIn(InputStream.nullInputStream());
         channel.open().verify(openTimeout);
 
         Set<ClientChannelEvent> events =
