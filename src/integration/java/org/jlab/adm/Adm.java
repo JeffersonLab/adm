@@ -37,12 +37,15 @@ import javax.net.ssl.TrustManagerFactory;
 /**
  * The running app and its Keycloak, as started by {@code docker compose -f build.yaml up}.
  *
- * <p>The environment variables ADM_URL and KEYCLOAK_URL point the tests at other ports.
+ * <p>The tests use the same ports as docker compose: ADM_HTTPS_PORT and ADM_KEYCLOAK_PORT, which
+ * the integrationTest task also reads from .env. ADM_URL and KEYCLOAK_URL override the URLs.
  */
 final class Adm {
 
-  static final String ADM_URL = env("ADM_URL", "https://localhost:8443/adm");
-  static final String KEYCLOAK_URL = env("KEYCLOAK_URL", "http://localhost:8081/auth");
+  static final String ADM_URL =
+      env("ADM_URL", "https://localhost:" + env("ADM_HTTPS_PORT", "8443") + "/adm");
+  static final String KEYCLOAK_URL =
+      env("KEYCLOAK_URL", "http://localhost:" + env("ADM_KEYCLOAK_PORT", "8081") + "/auth");
 
   /** The app in the demo data */
   static final String APP = "testapp";
@@ -85,10 +88,12 @@ final class Adm {
 
     while (!ready && Instant.now().isBefore(end)) {
       try {
-        HttpResponse<String> response = get("/log", serviceAccountToken());
+        // The admin's password login works once Keycloak's setup scripts have all run
+        HttpResponse<String> response = get("/log", adminToken());
         ready = response.statusCode() == 200;
         problem = "GET /log returned " + response.statusCode();
-      } catch (IOException | RuntimeException e) {
+      } catch (IOException | RuntimeException | AssertionError e) {
+        // Such as a failed token request while Keycloak is still creating the realm
         problem = e.toString();
       }
 

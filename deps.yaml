@@ -2,10 +2,9 @@ services:
   oracle:
     image: gvenzl/oracle-xe:21.3.0
     hostname: oracle
-    container_name: oracle
     ports:
-      - "1521:1521"
-      - "5500:5500"
+      - "${ADM_ORACLE_PORT:-1521}:1521"
+      - "${ADM_ORACLE_EM_PORT:-5500}:5500"
     environment:
       ORACLE_PASSWORD: testing
       TZ: 'America/New_York'
@@ -15,19 +14,18 @@ services:
   keycloak:
     image: jeffersonlab/keycloak:2.6.0
     hostname: keycloak
-    container_name: keycloak
     ports:
-      - "8081:8080"
-      - "9991:9990"
+      - "${ADM_KEYCLOAK_PORT:-8081}:8080"
+      - "${ADM_KEYCLOAK_MANAGEMENT_PORT:-9991}:9990"
     environment:
-      KC_FRONTEND_URL: 'http://localhost:8081/auth'
+      KC_FRONTEND_URL: 'http://localhost:${ADM_KEYCLOAK_PORT:-8081}/auth'
       KC_BACKEND_URL: 'http://keycloak:8080/auth'
       KC_HTTP_RELATIVE_PATH: '/auth'
       KC_BOOTSTRAP_ADMIN_USERNAME: 'admin'
       KC_BOOTSTRAP_ADMIN_PASSWORD: 'admin'
       KC_CLIENT_NAME: adm
       KC_RESOURCE: adm
-      KC_REDIRECT_URIS: '["https://localhost:8443/adm/*"]'
+      KC_REDIRECT_URIS: '["https://localhost:${ADM_HTTPS_PORT:-8443}/adm/*"]'
     volumes:
       - ./container/keycloak/initdb.d/03_customize.sh:/container-entrypoint-initdb.d/03_customize.sh
 
@@ -37,8 +35,7 @@ services:
       context: .
       dockerfile: Dockerfile-sshd
     hostname: sshd
-    container_name: sshd
     ports:
-      - "1234:22"
+      - "${ADM_SSHD_PORT:-1234}:22"
     environment:
       TEST_USER_AUTHORIZED_KEY: ${TEST_USER_AUTHORIZED_KEY}
