@@ -34,7 +34,7 @@ RUN mkdir -p /home/dev/.ssh \
      && chown -R dev /home/dev \
      && chmod 0700 /home/dev/.ssh \
      && cd /tmp \
-     && curl -fO https://dlcdn.apache.org/mina/sshd/${SSHD_VER}/apache-sshd-${SSHD_VER}.tar.gz \
+     && curl -fO https://archive.apache.org/dist/mina/sshd/${SSHD_VER}/apache-sshd-${SSHD_VER}.tar.gz \
      && tar -xvzf apache-sshd-${SSHD_VER}.tar.gz \
      && chmod +x apache-sshd-${SSHD_VER}/bin/ssh.sh
 
