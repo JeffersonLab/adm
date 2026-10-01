@@ -8,6 +8,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.math.BigInteger;
 import java.net.URI;
@@ -16,8 +17,11 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.GeneralSecurityException;
-import java.security.cert.X509Certificate;
+import java.security.KeyStore;
+import java.security.cert.CertificateFactory;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
@@ -28,8 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 
 /**
  * The running app and its Keycloak, as started by {@code docker compose -f build.yaml up}.
@@ -63,7 +66,10 @@ final class Adm {
   private static final Duration JOB_TIMEOUT = Duration.ofSeconds(60);
 
   private static final HttpClient HTTP =
-      HttpClient.newBuilder().sslContext(trustAll()).connectTimeout(Duration.ofSeconds(5)).build();
+      HttpClient.newBuilder()
+          .sslContext(sslContext())
+          .connectTimeout(Duration.ofSeconds(5))
+          .build();
 
   private static boolean ready = false;
 
@@ -284,27 +290,31 @@ final class Adm {
         .replace("&amp;", "&");
   }
 
-  /** The app's certificate is self-signed */
-  private static SSLContext trustAll() {
-    TrustManager trustAll =
-        new X509TrustManager() {
-          @Override
-          public void checkClientTrusted(X509Certificate[] chain, String authType) {}
+  /**
+   * Trusts the usual CAs, plus the self-signed certificate of the jeffersonlab/wildfly image that
+   * the app runs in. If that image changes its certificate, save the new one with: {@code openssl
+   * s_client -connect localhost:8443 </dev/null | openssl x509 >
+   * src/integration/resources/wildfly-localhost.crt}
+   */
+  private static SSLContext sslContext() {
+    Path cacerts = Path.of(System.getProperty("java.home"), "lib", "security", "cacerts");
 
-          @Override
-          public void checkServerTrusted(X509Certificate[] chain, String authType) {}
+    try (InputStream defaults = Files.newInputStream(cacerts);
+        InputStream wildfly = Adm.class.getResourceAsStream("/wildfly-localhost.crt")) {
+      KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+      trustStore.load(defaults, null);
+      trustStore.setCertificateEntry(
+          "wildfly-localhost",
+          CertificateFactory.getInstance("X.509").generateCertificate(wildfly));
 
-          @Override
-          public X509Certificate[] getAcceptedIssuers() {
-            return new X509Certificate[0];
-          }
-        };
+      TrustManagerFactory trustManagers =
+          TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+      trustManagers.init(trustStore);
 
-    try {
       SSLContext context = SSLContext.getInstance("TLS");
-      context.init(null, new TrustManager[] {trustAll}, null);
+      context.init(null, trustManagers.getTrustManagers(), null);
       return context;
-    } catch (GeneralSecurityException e) {
+    } catch (IOException | GeneralSecurityException e) {
       throw new IllegalStateException(e);
     }
   }
