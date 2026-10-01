@@ -64,6 +64,17 @@ tasks.register('integrationTest', Test) {
     // The services may still be starting, and they are not up to date with the source files
     outputs.upToDateWhen { false }
 
+    // Use the ports in .env, as docker compose does; the environment takes precedence
+    def dotEnv = file('.env')
+    if (dotEnv.exists()) {
+        dotEnv.eachLine { line ->
+            def m = line =~ /^\s*(ADM_\w+)\s*=\s*["']?(.*?)["']?\s*$/
+            if (m.matches() && !System.getenv(m.group(1))) {
+                environment m.group(1), m.group(2)
+            }
+        }
+    }
+
     testLogging {
         events "passed", "skipped", "failed"
         exceptionFormat = "full"

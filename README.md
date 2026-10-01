@@ -37,6 +37,33 @@ http://localhost:8080/adm
 
 **Note**: Login with demo username "tbrown" and password "password".   Use env "local-demo", app "testapp", ver "1.0.0".
 
+### Ports
+The containers publish these ports on the host.  If another project already uses some of them, or you run a second copy of adm, set other ports in a `.env` file next to `compose.yaml`, which Compose reads, or in the environment:
+
+| Variable | Default | Port of |
+|---|---|---|
+| ADM_HTTPS_PORT | 8443 | app (HTTPS) |
+| ADM_HTTP_PORT | 8080 | app (HTTP) |
+| ADM_MANAGEMENT_PORT | 9990 | Wildfly management |
+| ADM_KEYCLOAK_PORT | 8081 | Keycloak |
+| ADM_KEYCLOAK_MANAGEMENT_PORT | 9991 | Keycloak management |
+| ADM_ORACLE_PORT | 1521 | Oracle |
+| ADM_ORACLE_EM_PORT | 5500 | Oracle Enterprise Manager |
+| ADM_SSHD_PORT | 1234 | sshd (the demo data's "local-dev" env deploys to port 1234) |
+
+For example, a `.env` for a second copy:
+```
+ADM_HTTPS_PORT=18443
+ADM_HTTP_PORT=18080
+ADM_MANAGEMENT_PORT=19990
+ADM_KEYCLOAK_PORT=18081
+ADM_KEYCLOAK_MANAGEMENT_PORT=19991
+ADM_ORACLE_PORT=11521
+ADM_ORACLE_EM_PORT=15500
+ADM_SSHD_PORT=11234
+```
+Compose names the containers, network, and images after the project's directory, such as `adm-oracle-1`, so a copy in another directory, such as a git worktree, gets its own.  Each copy uses about 4 GB of memory.
+
 ## Install
 This application requires a Java 17+ JVM and standard library to run, plus a Jakarta EE 10 application server (developed with Wildfly).
 
@@ -91,7 +118,7 @@ Further, the local DataSource must also leverage localhost port forwarding so th
 
 The [server](https://github.com/JeffersonLab/wildfly/blob/main/scripts/server-setup.sh) and [app](https://github.com/JeffersonLab/wildfly/blob/main/scripts/app-setup.sh) setup scripts can be used to setup a local instance of Wildfly.
 
-The user you use to run Wildfly needs to have an SSH public/private key pair (ssh-keygen) in the default location (~/.ssh).   The public key needs to be added to the `authorized_keys` file of user `testuser` in the container named "sshd".  This can be done by creating a file named `.env` in the root of the project containing the env name "TEST_USER_AUTHORIZED_KEY" with value being Wildfly user's public key.  This env will then be passed in via deps.yaml environment setting.
+The user you use to run Wildfly needs to have an SSH public/private key pair (ssh-keygen) in the default location (~/.ssh).   The public key needs to be added to the `authorized_keys` file of user `testuser` in the container of the `sshd` service.  This can be done by creating a file named `.env` in the root of the project containing the env name "TEST_USER_AUTHORIZED_KEY" with value being Wildfly user's public key.  This env will then be passed in via deps.yaml environment setting.
 
 The unit tests run with `gradlew build`, or alone with `gradlew test`.  They need no database, Wildfly, or containers: the SSH tests start their own in-process SSH server.
 
@@ -100,7 +127,7 @@ The integration tests run against the app and its services in containers, built 
 docker compose -f build.yaml up -d --build
 gradlew integrationTest
 ```
-They wait up to 5 minutes for the services to start (set `ADM_READY_TIMEOUT_SECONDS` to change that), then log in with the demo users and the `adm` client's service account, as CI deploys do.  They add their own app envs to deploy to, and remove them afterwards.  To test an app on other ports, set `ADM_URL` (default `https://localhost:8443/adm`) and `KEYCLOAK_URL` (default `http://localhost:8081/auth`).
+They wait up to 5 minutes for the services to start (set `ADM_READY_TIMEOUT_SECONDS` to change that), then log in with the demo users and the `adm` client's service account, as CI deploys do.  They add their own app envs to deploy to, and remove them afterwards.  They use the same [ports](#ports) as Compose, including those in `.env`.  To test an app elsewhere, set `ADM_URL` (default `https://localhost:8443/adm`) and `KEYCLOAK_URL` (default `http://localhost:8081/auth`).
 
 ## Release
 1. Bump the version number in the VERSION file and commit and push to GitHub (using [Semantic Versioning](https://semver.org/)).
