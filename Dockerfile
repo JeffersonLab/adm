@@ -1,5 +1,5 @@
 ARG BUILD_IMAGE=gradle:9-jdk21
-ARG RUN_IMAGE=jeffersonlab/wildfly:3.0.1
+ARG RUN_IMAGE=jeffersonlab/wildfly:3.1.0
 ARG SSHD_VER=2.18.0
 
 ################## Stage 0
