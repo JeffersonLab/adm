@@ -9,6 +9,7 @@ A [Jakarta EE 10](https://en.wikipedia.org/wiki/Jakarta_EE) web application for 
 - [Quick Start with Compose](https://github.com/JeffersonLab/adm#quick-start-with-compose)
 - [Install](https://github.com/JeffersonLab/adm#install)
 - [Configure](https://github.com/JeffersonLab/adm#configure)
+- [API](https://github.com/JeffersonLab/adm#api)
 - [Build](https://github.com/JeffersonLab/adm#build)
 - [Develop](https://github.com/JeffersonLab/adm#develop)
 - [Release](https://github.com/JeffersonLab/adm#release)
@@ -91,6 +92,38 @@ file of each remote user account needed for deployments.   It's also possible to
 
 ### Database
 The application requires an Oracle 19+ database with the following [schema](https://github.com/JeffersonLab/adm/tree/main/container/oracle/initdb.d) installed.   The application server hosting the app must also be configured with a JNDI datasource.
+
+## API
+Clients such as CI authenticate with a Keycloak bearer token, usually a service account's from the client credentials grant, as the [Deploy to JLab](https://github.com/JeffersonLab/general-workflows/blob/main/.github/workflows/jlab-deploy-app.yaml) action does.  Only an app env's request service user and users with the `adm-admin` role may deploy to it and see its jobs.
+
+### Deploy
+`POST /adm/deploy` with the form parameters `env`, `app` and `ver` (a semantic version) starts a deploy job and returns its ID at once:
+```
+{"jobId": 13}
+```
+A refused deploy returns its reason, with HTTP status 200: `{"exception": "..."}`.
+
+### Job status
+`GET /adm/job?id=<jobId>` returns a deploy job's status:
+```
+{"jobId": 13, "app": "testapp", "env": "local-demo", "version": "1.2.3",
+ "start": "2026-10-05T14:12:55-04:00", "end": "2026-10-05T14:12:56-04:00",
+ "exitCode": 0, "out": "1.2.3\n", "err": null, "error": null}
+```
+- `end` and `exitCode` are null while the job runs; poll until `end` is set.  A deploy command is stopped after 10 minutes.  The deploy succeeded if `exitCode` is 0.
+- `out` and `err` are the deploy command's standard output and standard error.  `error` says why the command could not run or finish, such as an unknown host or a timeout.  Each is cut to its last 64 KiB, and is null when empty.
+- A missing or invalid ID returns HTTP status 400, a caller who may not see the job 403, and an unknown job 404, each with the reason: `{"exception": "..."}`.
+
+For example, to wait for a job, for a little longer than a deploy command may run, and fail unless it succeeded:
+```
+for i in $(seq 1 130); do
+  STATUS=$(curl -sS --fail-with-body -H "Authorization: Bearer ${ACCESS_TOKEN}" "https://ace.jlab.org/adm/job?id=${JOB_ID}") || { echo "${STATUS}"; exit 1; }
+  [ "$(echo "${STATUS}" | jq '.end')" != "null" ] && break
+  sleep 5
+done
+echo "${STATUS}"
+echo "${STATUS}" | jq -e '.exitCode == 0'
+```
 
 ## Build
 This project is built with [Java 21](https://adoptium.net/) (compiled to Java 17 bytecode), and uses the [Gradle 9](https://gradle.org/) build tool to automatically download dependencies and build the project from source:

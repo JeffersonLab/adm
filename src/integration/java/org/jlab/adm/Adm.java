@@ -198,6 +198,44 @@ final class Adm {
     return fail("Job " + jobId + " did not finish within " + JOB_TIMEOUT);
   }
 
+  /** Gets a deploy job's status from the job endpoint. */
+  static HttpResponse<String> job(String token, String id)
+      throws IOException, InterruptedException {
+    return get("/job?id=" + URLEncoder.encode(id, StandardCharsets.UTF_8), token);
+  }
+
+  /** Waits for a deploy job to finish, reading its status from the job endpoint, as CI does. */
+  static JsonObject awaitJobStatus(BigInteger jobId, String token)
+      throws IOException, InterruptedException {
+    Instant end = Instant.now().plus(JOB_TIMEOUT);
+
+    while (Instant.now().isBefore(end)) {
+      HttpResponse<String> response = job(token, jobId.toString());
+
+      assertEquals(200, response.statusCode(), response.body());
+
+      JsonObject status = json(response);
+
+      if (!status.isNull("end")) {
+        return status;
+      }
+
+      Thread.sleep(500);
+    }
+
+    return fail("Job " + jobId + " did not finish within " + JOB_TIMEOUT);
+  }
+
+  /** Requests a deploy that is expected to start, and returns its job ID. */
+  static BigInteger startDeploy(String token, String env, String ver)
+      throws IOException, InterruptedException {
+    JsonObject result = deploy(token, env, APP, ver);
+
+    assertTrue(result.containsKey("jobId"), result.toString());
+
+    return result.getJsonNumber("jobId").bigIntegerValue();
+  }
+
   /**
    * Adds an env of the demo app, as an admin, with a unique name.
    *

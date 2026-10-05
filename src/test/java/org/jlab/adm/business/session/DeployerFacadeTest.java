@@ -1,6 +1,8 @@
 package org.jlab.adm.business.session;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -30,6 +32,9 @@ class DeployerFacadeTest {
 
   /** Jobs handed to the SSHFacade to run */
   private final List<DeployJob> started = new ArrayList<>();
+
+  /** The one job in the database, with ID 7 */
+  private final DeployJob storedJob = new DeployJob(appEnv, "1.2.3");
 
   @Test
   void requestServiceUserCanDeploy() throws Exception {
@@ -116,6 +121,41 @@ class DeployerFacadeTest {
     assertTrue(started.isEmpty());
   }
 
+  @Test
+  void requestServiceUserCanViewJob() throws Exception {
+    assertSame(storedJob, facade(SERVICE_USER, false).findJob(BigInteger.valueOf(7)));
+  }
+
+  @Test
+  void adminCanViewJob() throws Exception {
+    assertSame(storedJob, facade("someone", true).findJob(BigInteger.valueOf(7)));
+  }
+
+  @Test
+  void otherUserCannotViewJob() {
+    UserFriendlyException e =
+        assertThrows(
+            UserFriendlyException.class,
+            () -> facade("someone", false).findJob(BigInteger.valueOf(7)));
+
+    assertEquals("User someone is not authorized to view deploy job 7", e.getMessage());
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"", "anonymous", "ANONYMOUS"})
+  void anonymousCannotViewJob(String caller) {
+    UserFriendlyException e =
+        assertThrows(
+            UserFriendlyException.class, () -> facade(caller, true).findJob(BigInteger.valueOf(7)));
+
+    assertTrue(e.getMessage().contains("authenticate"), e.getMessage());
+  }
+
+  @Test
+  void unknownJobIsNull() throws Exception {
+    assertNull(facade(SERVICE_USER, false).findJob(BigInteger.valueOf(8)));
+  }
+
   private DeployerFacade facade(String caller, boolean admin) {
     DeployerFacade facade = new DeployerFacade();
 
@@ -135,6 +175,11 @@ class DeployerFacadeTest {
           public BigInteger createReturnId(DeployJob job) {
             job.setDeployJobId(BigInteger.ONE);
             return job.getDeployJobId();
+          }
+
+          @Override
+          public DeployJob find(Object id) {
+            return BigInteger.valueOf(7).equals(id) ? storedJob : null;
           }
         };
 
