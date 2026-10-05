@@ -27,11 +27,7 @@ public class DeployerFacade {
   public BigInteger deploy(String env, String app, String ver)
       throws UserFriendlyException, IOException {
 
-    String username = context.getCallerPrincipal().getName();
-
-    if (username == null || username.isEmpty() || username.equalsIgnoreCase("ANONYMOUS")) {
-      throw new UserFriendlyException("You must authenticate before issuing a deploy command");
-    }
+    String username = authenticatedUsername("issuing a deploy command");
 
     AppEnv appEnv = appEnvFacade.find(app, env);
 
@@ -39,9 +35,7 @@ public class DeployerFacade {
       throw new UserFriendlyException("AppEnv not found for app " + app + " and env " + env);
     }
 
-    String requestServiceUsername = appEnv.getRequestServiceUsername();
-
-    if (!username.equals(requestServiceUsername) && !context.isCallerInRole("adm-admin")) {
+    if (!mayDeploy(username, appEnv)) {
       throw new UserFriendlyException(
           "User " + username + " is not authorized to deploy app " + app + " to env " + env);
     }
@@ -56,6 +50,42 @@ public class DeployerFacade {
     sshFacade.asyncExecuteRemoteCommand(job);
 
     return jobId;
+  }
+
+  /**
+   * Finds a deploy job, to report its status. Those who may deploy to its env may see it.
+   *
+   * @return the job, or null if there is none with this ID
+   * @throws UserFriendlyException if the caller may not see the job
+   */
+  @PermitAll
+  public DeployJob findJob(BigInteger jobId) throws UserFriendlyException {
+    String username = authenticatedUsername("viewing a deploy job");
+
+    DeployJob job = deployJobFacade.find(jobId);
+
+    if (job != null && !mayDeploy(username, job.getAppEnv())) {
+      throw new UserFriendlyException(
+          "User " + username + " is not authorized to view deploy job " + jobId);
+    }
+
+    return job;
+  }
+
+  private String authenticatedUsername(String action) throws UserFriendlyException {
+    String username = context.getCallerPrincipal().getName();
+
+    if (username == null || username.isEmpty() || username.equalsIgnoreCase("ANONYMOUS")) {
+      throw new UserFriendlyException("You must authenticate before " + action);
+    }
+
+    return username;
+  }
+
+  // The env's request service user, such as CI's service account, and admins
+  private boolean mayDeploy(String username, AppEnv appEnv) {
+    return username.equals(appEnv.getRequestServiceUsername())
+        || context.isCallerInRole("adm-admin");
   }
 
   private void validateSemver(String ver) throws UserFriendlyException {
