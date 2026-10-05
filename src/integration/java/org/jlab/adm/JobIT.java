@@ -147,4 +147,18 @@ class JobIT {
     assertNotNull(location);
     assertTrue(location.contains("/protocol/openid-connect/auth"), location);
   }
+
+  @Test
+  void invalidTokenIsUnauthorized() throws Exception {
+    // A token whose signature does not verify, which the server treats as it does an expired one:
+    // a 401 that a polling client can fail on, not a redirect to the login page
+    String token = Adm.serviceAccountToken();
+    String tampered = token.substring(0, token.lastIndexOf('.') + 1) + "AAAA";
+
+    HttpResponse<String> response = Adm.job(tampered, "1");
+
+    assertEquals(401, response.statusCode(), response.body());
+    String challenge = response.headers().firstValue("WWW-Authenticate").orElse("");
+    assertTrue(challenge.contains("invalid_token"), challenge);
+  }
 }
