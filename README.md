@@ -96,6 +96,8 @@ The application requires an Oracle 19+ database with the following [schema](http
 ## API
 Clients such as CI authenticate with a Keycloak bearer token, usually a service account's from the client credentials grant, as the [Deploy to JLab](https://github.com/JeffersonLab/general-workflows/blob/main/.github/workflows/jlab-deploy-app.yaml) action does.  Only an app env's request service user and users with the `adm-admin` role may deploy to it and see its jobs.
 
+A request without a token is redirected to the login page (HTTP status 302), and one with an invalid or expired token returns HTTP status 401.  Access tokens are short-lived, 5 minutes by default in Keycloak, and a deploy may take longer, so a client that waits for a job should request a new token for each poll.
+
 ### Deploy
 `POST /adm/deploy` with the form parameters `env`, `app` and `ver` (a semantic version) starts a deploy job and returns its ID at once:
 ```
@@ -114,9 +116,14 @@ A refused deploy returns its reason, with HTTP status 200: `{"exception": "..."}
 - `out` and `err` are the deploy command's standard output and standard error.  `error` says why the command could not run or finish, such as an unknown host or a timeout.  Each is cut to its last 64 KiB, and is null when empty.
 - A missing or invalid ID returns HTTP status 400, a caller who may not see the job 403, and an unknown job 404, each with the reason: `{"exception": "..."}`.
 
-For example, to wait for a job, for a little longer than a deploy command may run, and fail unless it succeeded:
+For example, to wait for a job, for a little longer than a deploy command may run, with a new token for each poll, and fail unless it succeeded:
 ```
+token() {
+  curl -sS --fail-with-body -u "${CLIENT_ID}:${SECRET}" -d "grant_type=client_credentials" "https://ace.jlab.org/auth/realms/ace/protocol/openid-connect/token" | jq -er '.access_token'
+}
+
 for i in $(seq 1 130); do
+  ACCESS_TOKEN=$(token) || { echo "token request failed"; exit 1; }
   STATUS=$(curl -sS --fail-with-body -H "Authorization: Bearer ${ACCESS_TOKEN}" "https://ace.jlab.org/adm/job?id=${JOB_ID}") || { echo "${STATUS}"; exit 1; }
   [ "$(echo "${STATUS}" | jq '.end')" != "null" ] && break
   sleep 5
