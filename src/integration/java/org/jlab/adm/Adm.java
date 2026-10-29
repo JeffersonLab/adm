@@ -324,8 +324,8 @@ final class Adm {
         .collect(Collectors.joining("&"));
   }
 
-  /** Reverses the JSTL fn:escapeXml used on the log page */
-  private static String unescape(String text) {
+  /** Reverses the JSTL fn:escapeXml used on the log and inventory pages */
+  static String unescape(String text) {
     return text.replace("&lt;", "<")
         .replace("&gt;", ">")
         .replace("&#039;", "'")

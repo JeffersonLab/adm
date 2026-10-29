@@ -13,7 +13,14 @@ jlab.addRow = function() {
         deployHostname = $("#row-deploy-hostname").val(),
         deployPort = $("#row-deploy-port").val(),
         deployCommand = $("#row-deploy-command").val(),
+        source = $("#row-form").data("copy-source"),
         reloading = false;
+
+    // A copy must name a new App/env pair; the server refuses any other existing pair
+    if (source && appName === source.appName && envName === source.envName) {
+        alert('Change the App Name or Env Name: App ' + appName + ' already has an env named ' + envName);
+        return;
+    }
 
     $(".dialog-submit-button")
         .height($(".dialog-submit-button").height())
@@ -164,10 +171,28 @@ jlab.setNewApp = function(newApp) {
         .autocomplete(newApp ? "disable" : "enable")
         .attr("placeholder", newApp ? "New app name" : "Search existing apps");
 };
+jlab.fillRow = function($row) {
+    $("#row-app-name").val($row.attr("data-app-name"));
+    $("#row-env-name").val($row.attr("data-env-name"));
+    $("#row-request-username").val($row.attr("data-request-username"));
+    $("#row-deploy-username").val($row.attr("data-deploy-username"));
+    $("#row-deploy-hostname").val($row.attr("data-deploy-hostname"));
+    $("#row-deploy-port").val($row.attr("data-deploy-port"));
+    $("#row-deploy-command").val($row.attr("data-deploy-command"));
+};
+jlab.setCopySource = function(source) {
+    $("#row-form").toggleClass("copying", !!source).data("copy-source", source);
+    $("#copy-source").text(source ? source.appName + " / " + source.envName : "");
+    // Make room for the copy notice
+    $("#table-row-dialog").dialog("option", "height",
+        jlab.editableRowTable.dialog.height + (source ? 70 : 0));
+};
 $(document).on("dialogclose", "#table-row-dialog", function() {
     $("#row-form")[0].reset();
     $("#row-form").removeClass("editing");
     jlab.setNewApp(false);
+    // A later Add starts empty, not with the copied values
+    jlab.setCopySource(null);
 });
 $(document).on("change", "#row-new-app", function() {
     jlab.setNewApp($(this).is(":checked"));
@@ -175,19 +200,32 @@ $(document).on("change", "#row-new-app", function() {
 $(document).on("click", "#open-add-row-dialog-button", function() {
     $("#row-form").removeClass("editing");
     jlab.setNewApp(false);
+    jlab.setCopySource(null);
 });
 $(document).on("click", "#open-edit-row-dialog-button", function() {
     // An edit moves the record to another existing app; Apps edits an app itself
     $("#row-form").addClass("editing");
     jlab.setNewApp(false);
+    jlab.setCopySource(null);
+    jlab.fillRow($(".editable-row-table tr.selected-row"));
+});
+$(document).on("click", "#open-copy-row-dialog-button", function() {
+    // Copy fills Add from the selected record; its ID and deploy history stay with it
     var $selectedRow = $(".editable-row-table tr.selected-row");
-    $("#row-app-name").val($selectedRow.attr("data-app-name"));
-    $("#row-env-name").val($selectedRow.attr("data-env-name"));
-    $("#row-request-username").val($selectedRow.attr("data-request-username"));
-    $("#row-deploy-username").val($selectedRow.attr("data-deploy-username"));
-    $("#row-deploy-hostname").val($selectedRow.attr("data-deploy-hostname"));
-    $("#row-deploy-port").val($selectedRow.attr("data-deploy-port"));
-    $("#row-deploy-command").val($selectedRow.attr("data-deploy-command"));
+    $("#row-form")[0].reset();
+    $("#row-form").removeClass("editing");
+    jlab.setNewApp(false);
+    jlab.fillRow($selectedRow);
+    jlab.setCopySource({
+        appName: $selectedRow.attr("data-app-name"),
+        envName: $selectedRow.attr("data-env-name")
+    });
+    // The title must start with Add, so Save adds a record rather than editing the source
+    $("#table-row-dialog")
+        .dialog("option", "title", "Add " + jlab.editableRowTable.entity + " (Copy)")
+        .dialog("open");
+    // A copy is most often a new env of the same app
+    $("#row-env-name").trigger("focus").trigger("select");
 });
 $(document).on("table-row-add", function() {
     jlab.addRow();
