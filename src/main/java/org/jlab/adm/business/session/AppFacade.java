@@ -28,14 +28,23 @@ public class AppFacade extends AbstractFacade<App> {
   }
 
   @RolesAllowed("adm-admin")
-  public void addApp(String name, String docUrl) throws UserFriendlyException {
+  public App addApp(String name, String docUrl) throws UserFriendlyException {
     if (name == null || name.isEmpty()) {
       throw new UserFriendlyException("Name cannot be empty");
+    }
+
+    // Names differing only in case would look like the same app in lists and deploy requests
+    App existing = findByNameIgnoreCase(name);
+
+    if (existing != null) {
+      throw new UserFriendlyException("App already exists with name: " + existing.getName());
     }
 
     App app = new App(name, docUrl);
 
     create(app);
+
+    return app;
   }
 
   @RolesAllowed({"adm-admin"})
@@ -126,16 +135,52 @@ public class AppFacade extends AbstractFacade<App> {
     return q.getSingleResult();
   }
 
+  /** Finds the app with exactly this name; unlike filterList, no wildcards or case folding. */
   @PermitAll
   public App findByName(String appName) {
-    App app = null;
+    CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
+    CriteriaQuery<App> cq = cb.createQuery(App.class);
+    Root<App> root = cq.from(App.class);
+    cq.select(root);
+    cq.where(cb.equal(root.get("name"), appName));
 
-    List<App> appList = filterList(appName, 0, Integer.MAX_VALUE);
+    List<App> appList = getEntityManager().createQuery(cq).getResultList();
 
-    if (appList != null && appList.size() > 0) {
-      app = appList.get(0);
+    return appList.isEmpty() ? null : appList.get(0);
+  }
+
+  @PermitAll
+  public App findByNameIgnoreCase(String appName) {
+    CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
+    CriteriaQuery<App> cq = cb.createQuery(App.class);
+    Root<App> root = cq.from(App.class);
+    cq.select(root);
+    cq.where(cb.equal(cb.lower(root.get("name")), appName.toLowerCase()));
+
+    List<App> appList = getEntityManager().createQuery(cq).setMaxResults(1).getResultList();
+
+    return appList.isEmpty() ? null : appList.get(0);
+  }
+
+  /** Names of the apps that contain the term, ignoring case, for autocomplete. */
+  @PermitAll
+  public List<String> searchNames(String term, int max) {
+    CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
+    CriteriaQuery<String> cq = cb.createQuery(String.class);
+    Root<App> root = cq.from(App.class);
+    Path<String> name = root.get("name");
+    cq.select(name);
+
+    if (term != null && !term.isEmpty()) {
+      String pattern =
+          "%"
+              + term.toLowerCase().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+              + "%";
+      cq.where(cb.like(cb.lower(name), pattern, '\\'));
     }
 
-    return app;
+    cq.orderBy(cb.asc(name));
+
+    return getEntityManager().createQuery(cq).setMaxResults(max).getResultList();
   }
 }

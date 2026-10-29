@@ -4,3 +4,20 @@
 table td {
     word-break: break-word;
 }
+.page-description {
+    max-width: 60em;
+}
+/* Shown only while adding, with Create new App checked */
+#row-form .new-app-field,
+#row-form.editing #new-app-option {
+    display: none;
+}
+#row-form.new-app .new-app-field {
+    display: table-row;
+}
+#new-app-option {
+    margin-top: 0.25em;
+}
+#new-app-option input {
+    width: auto;
+}

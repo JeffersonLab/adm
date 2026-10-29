@@ -4,7 +4,7 @@
 <%@taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <%@taglib prefix="s" uri="jlab.tags.smoothness"%>
 <%@taglib prefix="t" tagdir="/WEB-INF/tags"%>
-<c:set value="App Envs" var="title"/>
+<c:set value="Deployment Allowlist" var="title"/>
 <t:inventory-page title="${title}">
     <jsp:attribute name="stylesheets">
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/v${initParam.releaseNumber}/css/app-envs.css"/>
@@ -58,6 +58,10 @@
             </form>
             </s:filter-flyout-widget>
             <h2 class="page-header-title"><c:out value="${title}"/></h2>
+            <p class="page-description">Each record allows its Request Username to deploy an App to an Env:
+                ADM runs the Deploy Command as the Deploy Username on the Deploy Hostname.
+                <a href="${pageContext.request.contextPath}/inventory/apps">Apps</a> hold what an app's envs share,
+                such as its documentation URL.</p>
             <div class="message-box"><c:out value="${selectionMessage}"/></div>
             <c:set var="readonly" value="${!pageContext.request.isUserInRole('adm-admin')}"/>
             <c:if test="${not readonly}">
@@ -131,7 +135,18 @@
                                 <label for="row-app-name">App Name</label>
                             </div>
                             <div class="li-value">
-                                <input type="text" id="row-app-name"/>
+                                <input type="text" id="row-app-name" placeholder="Search existing apps"/>
+                                <div id="new-app-option">
+                                    <label><input type="checkbox" id="row-new-app"/> Create new App</label>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="new-app-field">
+                            <div class="li-key">
+                                <label for="row-doc-url">App Doc URL</label>
+                            </div>
+                            <div class="li-value">
+                                <input type="text" id="row-doc-url" placeholder="Optional"/>
                             </div>
                         </li>
                         <li>
@@ -176,7 +191,7 @@
                         </li>
                         <li>
                             <div class="li-key">
-                                <label for="row-run-deploy-command">Deploy Command</label>
+                                <label for="row-deploy-command">Deploy Command</label>
                             </div>
                             <div class="li-value">
                                 <input type="text" id="row-deploy-command"/>

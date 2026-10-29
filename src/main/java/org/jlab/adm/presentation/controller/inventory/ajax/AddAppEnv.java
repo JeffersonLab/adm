@@ -38,6 +38,9 @@ public class AddAppEnv extends HttpServlet {
 
     try {
       appName = request.getParameter("appName");
+      // Only an explicit choice creates an app, so a mistyped name is refused instead
+      boolean newApp = "Y".equals(request.getParameter("newApp"));
+      String docUrl = request.getParameter("docUrl");
       envName = request.getParameter("envName");
       String requestUsername = request.getParameter("requestUsername");
       String deployUsername = request.getParameter("deployUsername");
@@ -47,6 +50,8 @@ public class AddAppEnv extends HttpServlet {
 
       appEnvService.addAppEnv(
           appName,
+          newApp,
+          docUrl,
           envName,
           requestUsername,
           deployUsername,

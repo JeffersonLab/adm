@@ -9,7 +9,7 @@
     <li${'/log' eq currentPath ? ' class="current-primary"' : ''}><a
             href="${pageContext.request.contextPath}/log">Log</a></li>
     <li${fn:startsWith(currentPath, '/inventory') ? ' class="current-primary"' : ''}><a
-            href="${pageContext.request.contextPath}/inventory/apps">Inventory</a></li>
+            href="${pageContext.request.contextPath}/inventory/app-envs">Inventory</a></li>
     <c:if test="${pageContext.request.isUserInRole('adm-admin')}">
         <li${fn:startsWith(currentPath, '/setup') ? ' class="current-primary"' : ''}>
             <a href="${pageContext.request.contextPath}/setup/settings">Setup</a>

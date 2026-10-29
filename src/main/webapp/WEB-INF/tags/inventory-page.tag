@@ -13,8 +13,8 @@
     </jsp:attribute>
     <jsp:attribute name="secondaryNavigation">
         <ul>
+            <li${'/inventory/app-envs' eq currentPath ? ' class="current-secondary"' : ''}><a href="${pageContext.request.contextPath}/inventory/app-envs">Deployment Allowlist</a></li>
             <li${'/inventory/apps' eq currentPath ? ' class="current-secondary"' : ''}><a href="${pageContext.request.contextPath}/inventory/apps">Apps</a></li>
-            <li${'/inventory/app-envs' eq currentPath ? ' class="current-secondary"' : ''}><a href="${pageContext.request.contextPath}/inventory/app-envs">App Envs</a></li>
         </ul>
     </jsp:attribute>
     <jsp:body>

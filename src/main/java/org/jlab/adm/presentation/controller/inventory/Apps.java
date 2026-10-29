@@ -26,6 +26,7 @@ public class Apps extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
+    String appName = request.getParameter("appName");
     int offset = ParamUtil.convertAndValidateNonNegativeInt(request, "offset", 0);
     Integer maxPerPage = ParamConverter.convertInteger(request, "max");
 
@@ -33,12 +34,12 @@ public class Apps extends HttpServlet {
       maxPerPage = 10;
     }
 
-    List<App> appList = appFacade.filterList(null, offset, maxPerPage);
-    long totalRecords = appFacade.countList(null);
+    List<App> appList = appFacade.filterList(appName, offset, maxPerPage);
+    long totalRecords = appFacade.countList(appName);
 
     Paginator paginator = new Paginator(totalRecords, offset, maxPerPage);
 
-    String selectionMessage = createSelectionMessage(paginator, null);
+    String selectionMessage = createSelectionMessage(paginator, appName);
 
     request.setAttribute("paginator", paginator);
     request.setAttribute("selectionMessage", selectionMessage);
