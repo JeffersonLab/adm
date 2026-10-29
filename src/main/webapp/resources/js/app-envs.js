@@ -1,10 +1,12 @@
 var jlab = jlab || {};
 jlab.editableRowTable = jlab.editableRowTable || {};
-jlab.editableRowTable.entity = 'App Env';
+jlab.editableRowTable.entity = 'Deployment Allowlist Record';
 jlab.editableRowTable.dialog.width = 650;
-jlab.editableRowTable.dialog.height = 400;
+jlab.editableRowTable.dialog.height = 460;
 jlab.addRow = function() {
     var appName = $("#row-app-name").val(),
+        newApp = $("#row-new-app").is(":checked"),
+        docUrl = $("#row-doc-url").val(),
         envName = $("#row-env-name").val(),
         requestUsername = $("#row-request-username").val(),
         deployUsername = $("#row-deploy-username").val(),
@@ -25,6 +27,8 @@ jlab.addRow = function() {
         type: "POST",
         data: {
             appName: appName,
+            newApp: newApp ? 'Y' : 'N',
+            docUrl: newApp ? docUrl : '',
             envName: envName,
             requestUsername: requestUsername,
             deployUsername: deployUsername,
@@ -153,15 +157,29 @@ jlab.removeRow = function() {
         }
     });
 };
+jlab.setNewApp = function(newApp) {
+    $("#row-form").toggleClass("new-app", newApp);
+    // A new app's name is typed, not chosen, so don't suggest existing ones
+    $("#row-app-name")
+        .autocomplete(newApp ? "disable" : "enable")
+        .attr("placeholder", newApp ? "New app name" : "Search existing apps");
+};
 $(document).on("dialogclose", "#table-row-dialog", function() {
     $("#row-form")[0].reset();
-
-    $("#row-topics").val(null).trigger("change");
-
-    $("#row-name").removeAttr("disabled");
-    $("#row-repo").removeAttr("disabled");
+    $("#row-form").removeClass("editing");
+    jlab.setNewApp(false);
+});
+$(document).on("change", "#row-new-app", function() {
+    jlab.setNewApp($(this).is(":checked"));
+});
+$(document).on("click", "#open-add-row-dialog-button", function() {
+    $("#row-form").removeClass("editing");
+    jlab.setNewApp(false);
 });
 $(document).on("click", "#open-edit-row-dialog-button", function() {
+    // An edit moves the record to another existing app; Apps edits an app itself
+    $("#row-form").addClass("editing");
+    jlab.setNewApp(false);
     var $selectedRow = $(".editable-row-table tr.selected-row");
     $("#row-app-name").val($selectedRow.attr("data-app-name"));
     $("#row-env-name").val($selectedRow.attr("data-env-name"));
@@ -178,7 +196,8 @@ $(document).on("table-row-edit", function() {
     jlab.editRow();
 });
 $(document).on("click", "#remove-row-button", function() {
-    var name = $(".editable-row-table tr.selected-row td:first-child").text().trim();
+    var $selectedRow = $(".editable-row-table tr.selected-row"),
+        name = $selectedRow.attr("data-app-name") + " " + $selectedRow.attr("data-env-name");
     if (confirm('Are you sure you want to remove ' + name + '?')) {
         jlab.removeRow();
     }
@@ -190,5 +209,14 @@ $(document).on("click", ".default-clear-panel", function () {
     return false;
 });
 $(function(){
-
+    $("#row-app-name").autocomplete({
+        source: jlab.contextPath + "/inventory/ajax/search-apps",
+        minLength: 0,
+        appendTo: "#table-row-dialog"
+    }).on("click", function() {
+        // List the apps before anything is typed, as a dropdown would
+        if (!$("#row-new-app").is(":checked") && !$(this).val()) {
+            $(this).autocomplete("search", "");
+        }
+    });
 });

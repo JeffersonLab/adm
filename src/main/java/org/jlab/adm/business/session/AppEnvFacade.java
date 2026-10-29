@@ -74,9 +74,18 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
     remove(appEnv);
   }
 
+  /**
+   * Adds an app env, to an existing app or, with newApp, to a new app made in the same transaction:
+   * if the env can't be added, the new app isn't either.
+   *
+   * @param newApp true to create the app, which must not exist yet; false to use an existing app
+   * @param docUrl the new app's documentation URL, or null; ignored unless newApp
+   */
   @RolesAllowed("adm-admin")
   public void addAppEnv(
       String appName,
+      boolean newApp,
+      String docUrl,
       String envName,
       String requestUsername,
       String deployUsername,
@@ -112,10 +121,16 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
       throw new UserFriendlyException("Deploy Command cannot be empty");
     }
 
-    App app = appFacade.findByName(appName);
+    App app;
 
-    if (app == null) {
-      throw new UserFriendlyException("App not found with name: " + appName);
+    if (newApp) {
+      app = appFacade.addApp(appName, docUrl);
+    } else {
+      app = findApp(appName);
+
+      if (find(appName, envName) != null) {
+        throw new UserFriendlyException("App " + appName + " already has an env named " + envName);
+      }
     }
 
     AppEnv env =
@@ -170,16 +185,18 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
       throw new UserFriendlyException("Deploy Command cannot be empty");
     }
 
-    App app = appFacade.findByName(appName);
-
-    if (app == null) {
-      throw new UserFriendlyException("App not found with name: " + appName);
-    }
+    App app = findApp(appName);
 
     AppEnv env = find(appEnvId);
 
     if (env == null) {
       throw new UserFriendlyException("Env not found with ID: " + appEnvId);
+    }
+
+    AppEnv existing = find(appName, envName);
+
+    if (existing != null && !existing.getAppEnvId().equals(appEnvId)) {
+      throw new UserFriendlyException("App " + appName + " already has an env named " + envName);
     }
 
     env.setName(envName);
@@ -191,6 +208,27 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
     env.setDeployCommand(deployCommand);
 
     edit(env);
+  }
+
+  /** Finds an existing app by its exact name, so a typo can't select or create another app. */
+  private App findApp(String appName) throws UserFriendlyException {
+    App app = appFacade.findByName(appName);
+
+    if (app == null) {
+      App similar = appFacade.findByNameIgnoreCase(appName);
+
+      if (similar != null) {
+        throw new UserFriendlyException(
+            "App not found with name: " + appName + " (did you mean " + similar.getName() + "?)");
+      }
+
+      throw new UserFriendlyException(
+          "App not found with name: "
+              + appName
+              + " (choose an existing app, or Create new App to add it)");
+    }
+
+    return app;
   }
 
   @PermitAll
