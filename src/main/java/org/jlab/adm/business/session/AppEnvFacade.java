@@ -93,33 +93,14 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
       Integer deployPort,
       String deployCommand)
       throws UserFriendlyException {
-    if (appName == null || appName.isEmpty()) {
-      throw new UserFriendlyException("App Name cannot be empty");
-    }
-
-    if (envName == null || envName.isEmpty()) {
-      throw new UserFriendlyException("Env Name cannot be empty");
-    }
-
-    if (requestUsername == null || requestUsername.isEmpty()) {
-      throw new UserFriendlyException("Request Username cannot be empty");
-    }
-
-    if (deployUsername == null || deployUsername.isEmpty()) {
-      throw new UserFriendlyException("Deploy Username cannot be empty");
-    }
-
-    if (deployHostname == null || deployHostname.isEmpty()) {
-      throw new UserFriendlyException("Deploy Hostname cannot be empty");
-    }
-
-    if (deployPort == null || deployPort < 0) {
-      throw new UserFriendlyException("Deploy Port must be positive integer");
-    }
-
-    if (deployCommand == null || deployCommand.isEmpty()) {
-      throw new UserFriendlyException("Deploy Command cannot be empty");
-    }
+    validate(
+        appName,
+        envName,
+        requestUsername,
+        deployUsername,
+        deployHostname,
+        deployPort,
+        deployCommand);
 
     App app;
 
@@ -157,33 +138,14 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
       Integer deployPort,
       String deployCommand)
       throws UserFriendlyException {
-    if (appName == null || appName.isEmpty()) {
-      throw new UserFriendlyException("App Name cannot be empty");
-    }
-
-    if (envName == null || envName.isEmpty()) {
-      throw new UserFriendlyException("Env Name cannot be empty");
-    }
-
-    if (requestUsername == null || requestUsername.isEmpty()) {
-      throw new UserFriendlyException("Request Username cannot be empty");
-    }
-
-    if (deployUsername == null || deployUsername.isEmpty()) {
-      throw new UserFriendlyException("Deploy Username cannot be empty");
-    }
-
-    if (deployHostname == null || deployHostname.isEmpty()) {
-      throw new UserFriendlyException("Deploy Hostname cannot be empty");
-    }
-
-    if (deployPort == null || deployPort < 0) {
-      throw new UserFriendlyException("Deploy Port must be positive integer");
-    }
-
-    if (deployCommand == null || deployCommand.isEmpty()) {
-      throw new UserFriendlyException("Deploy Command cannot be empty");
-    }
+    validate(
+        appName,
+        envName,
+        requestUsername,
+        deployUsername,
+        deployHostname,
+        deployPort,
+        deployCommand);
 
     App app = findApp(appName);
 
@@ -208,6 +170,36 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
     env.setDeployCommand(deployCommand);
 
     edit(env);
+  }
+
+  /** Refuses a record with a blank field, or a port SSH can't use, whether added or edited. */
+  static void validate(
+      String appName,
+      String envName,
+      String requestUsername,
+      String deployUsername,
+      String deployHostname,
+      Integer deployPort,
+      String deployCommand)
+      throws UserFriendlyException {
+    requireNonBlank("App Name", appName);
+    requireNonBlank("Env Name", envName);
+    requireNonBlank("Request Username", requestUsername);
+    requireNonBlank("Deploy Username", deployUsername);
+    requireNonBlank("Deploy Hostname", deployHostname);
+
+    if (deployPort == null || deployPort < 1 || deployPort > 65535) {
+      throw new UserFriendlyException(
+          "Deploy Port must be a whole number from 1 to 65535 (SSH usually uses 22)");
+    }
+
+    requireNonBlank("Deploy Command", deployCommand);
+  }
+
+  private static void requireNonBlank(String field, String value) throws UserFriendlyException {
+    if (value == null || value.isBlank()) {
+      throw new UserFriendlyException(field + " cannot be empty");
+    }
   }
 
   /** Finds an existing app by its exact name, so a typo can't select or create another app. */

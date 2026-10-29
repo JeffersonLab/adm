@@ -32,3 +32,8 @@ insert into SETTING (KEY, VALUE, TYPE, DESCRIPTION, TAG, WEIGHT) values ('EMAIL_
 insert into SETTING (KEY, VALUE, TYPE, DESCRIPTION, TAG, WEIGHT) values ('EMAIL_TESTING_ENABLED', 'N', 'BOOLEAN', 'Send all emails to testlead user group', 'EMAIL', 2);
 insert into SETTING (KEY, VALUE, TYPE, DESCRIPTION, TAG, WEIGHT) values ('EMAIL_DOMAIN_NAME', '@jlab.org', 'STRING', 'The email domain to append to usernames, starting with and including the ampersat.', 'EMAIL', 3);
 insert into SETTING (KEY, VALUE, TYPE, DESCRIPTION, TAG, WEIGHT) values ('EMAIL_SENDER_ADDRESS', 'ace-noreply@jlab.org', 'STRING', 'Email address to use as sender from emails generated in this app.  Note: this is not the same as "from".', 'EMAIL', 4);
+
+-- OPTIONAL: Request Username presets offered when adding or editing an app env; leave a row out to offer no preset.
+-- These are the demo's accounts: set each installation's own CI service account usernames.
+insert into SETTING (KEY, VALUE, TYPE, DESCRIPTION, TAG, WEIGHT) values ('GITHUB_REQUEST_USERNAME', 'service-account-adm', 'STRING', 'Username of the service account that GitHub Actions deploys with, offered as the GitHub Actions Request Username preset', 'DEPLOY', 1);
+insert into SETTING (KEY, VALUE, TYPE, DESCRIPTION, TAG, WEIGHT) values ('GITLAB_REQUEST_USERNAME', 'deployer-service', 'STRING', 'Username of the service account that GitLab CI deploys with, offered as the GitLab CI Request Username preset', 'DEPLOY', 2);

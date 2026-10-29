@@ -60,7 +60,7 @@ public class AddAppEnv extends HttpServlet {
           deployCommand);
     } catch (NumberFormatException e) {
       stat = "fail";
-      error = "port must be a positive integer";
+      error = "Unable to add App: Deploy Port must be a whole number from 1 to 65535";
     } catch (UserFriendlyException e) {
       stat = "fail";
       error = "Unable to add App: " + e.getUserMessage();

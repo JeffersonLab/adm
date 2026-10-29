@@ -56,6 +56,9 @@ public class EditAppEnv extends HttpServlet {
           deployHostname,
           deployPort,
           deployCommand);
+    } catch (NumberFormatException e) {
+      stat = "fail";
+      error = "Unable to edit App: Deploy Port must be a whole number from 1 to 65535";
     } catch (UserFriendlyException e) {
       stat = "fail";
       error = "Unable to edit App: " + e.getUserMessage();

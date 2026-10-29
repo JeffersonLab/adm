@@ -33,3 +33,18 @@ table td {
 #row-form.copying #copy-notice {
     display: block;
 }
+
+#row-request-preset {
+    display: block;
+    margin-bottom: 0.25em;
+}
+/* A preset's account shows here, but only Custom can change it */
+#row-form input[readonly] {
+    background-color: #eee;
+}
+.field-hint {
+    max-width: 350px;
+    margin-top: 0.15em;
+    font-size: 0.85em;
+    color: #555;
+}

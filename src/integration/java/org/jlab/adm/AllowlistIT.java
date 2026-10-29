@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Adding a deployment allowlist record (app env), with its app chosen or created (issue #36), or
- * copied from an existing record (issue #38).
+ * copied from an existing record (issue #38), and the dialog's defaults and checks (issue #37).
  */
 class AllowlistIT {
 
@@ -192,6 +192,98 @@ class AllowlistIT {
         Adm.removeAppEnv(env);
       }
     }
+  }
+
+  /** The demo database's settings name the presets, and the port starts at SSH's usual 22. */
+  @Test
+  void dialogOffersConfiguredPresetsAndPort22() throws Exception {
+    String page = allowlistPage(Adm.adminToken(), Adm.DEMO_ENV);
+
+    assertTrue(
+        page.contains("<option value=\"" + Adm.SERVICE_ACCOUNT + "\">GitHub Actions</option>"),
+        page);
+    assertTrue(page.contains("<option value=\"deployer-service\">GitLab CI</option>"), page);
+    assertTrue(page.contains("id=\"row-deploy-port\" value=\"22\""), page);
+  }
+
+  @Test
+  void portOutOfRangeIsRefused() throws Exception {
+    for (String port : new String[] {"0", "65536", "-22"}) {
+      JsonObject result = addAppEnvWith("deployPort", port);
+
+      assertEquals("fail", result.getString("stat"), port);
+      assertEquals(
+          "Unable to add App: Deploy Port must be a whole number from 1 to 65535 (SSH usually uses 22)",
+          result.getString("error"));
+    }
+  }
+
+  @Test
+  void portThatIsNotNumberIsRefused() throws Exception {
+    JsonObject result = addAppEnvWith("deployPort", "ssh");
+
+    assertEquals("fail", result.getString("stat"));
+    assertEquals(
+        "Unable to add App: Deploy Port must be a whole number from 1 to 65535",
+        result.getString("error"));
+  }
+
+  @Test
+  void blankRequestUsernameIsRefused() throws Exception {
+    JsonObject result = addAppEnvWith("requestUsername", "  ");
+
+    assertEquals("fail", result.getString("stat"));
+    assertEquals("Unable to add App: Request Username cannot be empty", result.getString("error"));
+  }
+
+  /** The port is checked before the record is looked up, so the demo record isn't changed. */
+  @Test
+  void editWithPortThatIsNotNumberIsRefused() throws Exception {
+    String sourceRow = row(allowlistPage(Adm.adminToken(), Adm.DEMO_ENV));
+    Map<String, String> source = rowData(sourceRow);
+
+    Map<String, String> form = new LinkedHashMap<>();
+    form.put("appEnvId", source.get("id"));
+    form.put("appName", source.get("app-name"));
+    form.put("envName", source.get("env-name"));
+    form.put("requestUsername", source.get("request-username"));
+    form.put("deployUsername", source.get("deploy-username"));
+    form.put("deployHostname", source.get("deploy-hostname"));
+    form.put("deployPort", "ssh");
+    form.put("deployCommand", source.get("deploy-command"));
+
+    JsonObject result = Adm.json(Adm.post("/inventory/ajax/edit-app-env", Adm.adminToken(), form));
+
+    assertEquals("fail", result.getString("stat"));
+    assertEquals(
+        "Unable to edit App: Deploy Port must be a whole number from 1 to 65535",
+        result.getString("error"));
+    assertEquals(sourceRow, row(allowlistPage(Adm.adminToken(), Adm.DEMO_ENV)));
+  }
+
+  /** Adds an env of the test app with one field replaced, removing it should the add succeed. */
+  private static JsonObject addAppEnvWith(String field, String value)
+      throws IOException, InterruptedException {
+    String env = "it-check-" + UUID.randomUUID().toString().substring(0, 8);
+
+    Map<String, String> form = new LinkedHashMap<>();
+    form.put("appName", Adm.APP);
+    form.put("newApp", "N");
+    form.put("envName", env);
+    form.put("requestUsername", Adm.SERVICE_ACCOUNT);
+    form.put("deployUsername", "testuser");
+    form.put("deployHostname", "sshd");
+    form.put("deployPort", "22");
+    form.put("deployCommand", "echo");
+    form.put(field, value);
+
+    JsonObject result = Adm.json(Adm.post("/inventory/ajax/add-app-env", Adm.adminToken(), form));
+
+    if ("ok".equals(result.getString("stat"))) {
+      Adm.removeAppEnv(env);
+    }
+
+    return result;
   }
 
   private static String uniqueAppName() {

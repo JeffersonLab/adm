@@ -93,6 +93,16 @@ file of each remote user account needed for deployments.   It's also possible to
 ### Database
 The application requires an Oracle 19+ database with the following [schema](https://github.com/JeffersonLab/adm/tree/main/container/oracle/initdb.d) installed.   The application server hosting the app must also be configured with a JNDI datasource.
 
+### Request Username presets
+The Deployment Allowlist's Add and Edit dialog offers the CI service accounts that request deploys as presets, so admins needn't type them.  Each preset is a setting with that account's username, which admins can change on the Settings page:
+
+| Setting | Preset |
+|---|---|
+| GITHUB_REQUEST_USERNAME | GitHub Actions |
+| GITLAB_REQUEST_USERNAME | GitLab CI |
+
+A preset is offered only when its setting exists, so an installation with neither offers only a custom account.  To add them to an existing database, insert the rows as [04_settings.sql](https://github.com/JeffersonLab/adm/blob/main/container/oracle/initdb.d/04_settings.sql) does, with your installation's usernames, then restart the app, or change any setting on the Settings page, so it reads them.
+
 ## API
 Clients such as CI authenticate with a Keycloak bearer token, usually a service account's from the client credentials grant, as the [Deploy to JLab](https://github.com/JeffersonLab/general-workflows/blob/main/.github/workflows/jlab-deploy-app.yaml) action does.  Only an app env's request service user and users with the `adm-admin` role may deploy to it and see its jobs.
 
