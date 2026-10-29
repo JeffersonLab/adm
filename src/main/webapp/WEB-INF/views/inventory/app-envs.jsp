@@ -66,6 +66,7 @@
             <c:set var="readonly" value="${!pageContext.request.isUserInRole('adm-admin')}"/>
             <c:if test="${not readonly}">
                 <s:editable-row-table-controls>
+                    <button type="button" id="open-copy-row-dialog-button" class="selected-row-action" disabled="disabled">Copy Existing</button>
                 </s:editable-row-table-controls>
             </c:if>
             <table class="data-table stripped-table ${readonly ? '' : 'uniselect-table editable-row-table'}">
@@ -129,6 +130,11 @@
         <s:editable-row-table-dialog>
             <section>
                 <form id="row-form">
+                    <div id="copy-notice">
+                        New record copied from <b id="copy-source"></b>. Change its App Name or Env Name,
+                        and check the usernames, hostname, port and command before saving.
+                        The original record is not changed.
+                    </div>
                     <ul class="key-value-list">
                         <li>
                             <div class="li-key">

@@ -21,3 +21,15 @@ table td {
 #new-app-option input {
     width: auto;
 }
+
+/* Shown only while copying an existing record */
+#copy-notice {
+    display: none;
+    margin-bottom: 0.5em;
+    padding: 0.5em;
+    border-left: 4px solid #4a7ebb;
+    background-color: #eef3fa;
+}
+#row-form.copying #copy-notice {
+    display: block;
+}
