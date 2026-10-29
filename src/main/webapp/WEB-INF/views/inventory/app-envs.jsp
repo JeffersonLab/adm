@@ -168,7 +168,23 @@
                                 <label for="row-request-username">Request Username</label>
                             </div>
                             <div class="li-value">
-                                <input type="text" id="row-request-username"/>
+                                <%-- Presets come from settings, so no installation's accounts are built in --%>
+                                <c:set var="githubUsername" value="${settings.get('GITHUB_REQUEST_USERNAME')}"/>
+                                <c:set var="gitlabUsername" value="${settings.get('GITLAB_REQUEST_USERNAME')}"/>
+                                <c:if test="${not empty githubUsername or not empty gitlabUsername}">
+                                    <select id="row-request-preset" aria-label="Request account">
+                                        <option value="" selected="selected">Custom account</option>
+                                        <c:if test="${not empty githubUsername}">
+                                            <option value="${fn:escapeXml(githubUsername)}">GitHub Actions</option>
+                                        </c:if>
+                                        <c:if test="${not empty gitlabUsername}">
+                                            <option value="${fn:escapeXml(gitlabUsername)}">GitLab CI</option>
+                                        </c:if>
+                                    </select>
+                                </c:if>
+                                <input type="text" id="row-request-username" placeholder="Keycloak username"/>
+                                <div class="field-hint">The account allowed to request this deploy from ADM,
+                                    usually a CI service account</div>
                             </div>
                         </li>
                         <li>
@@ -176,7 +192,9 @@
                                 <label for="row-deploy-username">Deploy Username</label>
                             </div>
                             <div class="li-value">
-                                <input type="text" id="row-deploy-username"/>
+                                <input type="text" id="row-deploy-username" placeholder="SSH username"/>
+                                <div class="field-hint">The account on the Deploy Hostname that ADM logs in to over SSH
+                                    to run the Deploy Command</div>
                             </div>
                         </li>
                         <li>
@@ -192,7 +210,8 @@
                                 <label for="row-deploy-port">Deploy Port</label>
                             </div>
                             <div class="li-value">
-                                <input type="text" id="row-deploy-port"/>
+                                <%-- The form's default, so Add and a reset start with SSH's usual port --%>
+                                <input type="number" id="row-deploy-port" value="22" min="1" max="65535" step="1"/>
                             </div>
                         </li>
                         <li>

@@ -2,7 +2,7 @@ var jlab = jlab || {};
 jlab.editableRowTable = jlab.editableRowTable || {};
 jlab.editableRowTable.entity = 'Deployment Allowlist Record';
 jlab.editableRowTable.dialog.width = 650;
-jlab.editableRowTable.dialog.height = 460;
+jlab.editableRowTable.dialog.height = 580;
 jlab.addRow = function() {
     var appName = $("#row-app-name").val(),
         newApp = $("#row-new-app").is(":checked"),
@@ -15,6 +15,10 @@ jlab.addRow = function() {
         deployCommand = $("#row-deploy-command").val(),
         source = $("#row-form").data("copy-source"),
         reloading = false;
+
+    if (!jlab.validateRow()) {
+        return;
+    }
 
     // A copy must name a new App/env pair; the server refuses any other existing pair
     if (source && appName === source.appName && envName === source.envName) {
@@ -78,6 +82,10 @@ jlab.editRow = function(removeSync) {
         deployPort = $("#row-deploy-port").val(),
         deployCommand = $("#row-deploy-command").val(),
         reloading = false;
+
+    if (!jlab.validateRow()) {
+        return;
+    }
 
     $(".dialog-submit-button")
         .height($(".dialog-submit-button").height())
@@ -164,6 +172,57 @@ jlab.removeRow = function() {
         }
     });
 };
+/* Says which required fields are blank or which port is out of range, before asking the server */
+jlab.validateRow = function() {
+    var required = [
+            ["#row-app-name", "App Name"],
+            ["#row-env-name", "Env Name"],
+            ["#row-request-username", "Request Username"],
+            ["#row-deploy-username", "Deploy Username"],
+            ["#row-deploy-hostname", "Deploy Hostname"],
+            ["#row-deploy-command", "Deploy Command"]
+        ],
+        port = $.trim($("#row-deploy-port").val()),
+        problems = [],
+        $first = null;
+
+    $.each(required, function(i, field) {
+        if (!$.trim($(field[0]).val())) {
+            problems.push(field[1] + " is required");
+            $first = $first || $(field[0]);
+        }
+    });
+
+    // A number input's value is empty when what was typed isn't a number
+    if (!/^[0-9]+$/.test(port) || Number(port) < 1 || Number(port) > 65535) {
+        problems.push("Deploy Port must be a whole number from 1 to 65535 (SSH usually uses 22)");
+        $first = $first || $("#row-deploy-port");
+    }
+
+    if (problems.length > 0) {
+        alert(problems.join("\n"));
+        $first.trigger("focus");
+        return false;
+    }
+
+    return true;
+};
+/* Shows the preset whose account the Request Username is, or Custom; a preset's account is fixed */
+jlab.syncRequestPreset = function() {
+    var $preset = $("#row-request-preset"),
+        username = $("#row-request-username").val(),
+        match = "";
+
+    $preset.find("option").each(function() {
+        if (this.value !== "" && this.value === username) {
+            match = this.value;
+            return false;
+        }
+    });
+
+    $preset.val(match);
+    $("#row-request-username").prop("readonly", match !== "");
+};
 jlab.setNewApp = function(newApp) {
     $("#row-form").toggleClass("new-app", newApp);
     // A new app's name is typed, not chosen, so don't suggest existing ones
@@ -179,6 +238,8 @@ jlab.fillRow = function($row) {
     $("#row-deploy-hostname").val($row.attr("data-deploy-hostname"));
     $("#row-deploy-port").val($row.attr("data-deploy-port"));
     $("#row-deploy-command").val($row.attr("data-deploy-command"));
+    // Only selects the preset that matches; the record's own username is kept
+    jlab.syncRequestPreset();
 };
 jlab.setCopySource = function(source) {
     $("#row-form").toggleClass("copying", !!source).data("copy-source", source);
@@ -193,14 +254,26 @@ $(document).on("dialogclose", "#table-row-dialog", function() {
     jlab.setNewApp(false);
     // A later Add starts empty, not with the copied values
     jlab.setCopySource(null);
+    jlab.syncRequestPreset();
+});
+$(document).on("change", "#row-request-preset", function() {
+    var username = $(this).val();
+    if (username) {
+        $("#row-request-username").val(username).prop("readonly", true);
+    } else {
+        // Custom starts from the preset's account, to edit or replace
+        $("#row-request-username").prop("readonly", false).trigger("focus").trigger("select");
+    }
 });
 $(document).on("change", "#row-new-app", function() {
     jlab.setNewApp($(this).is(":checked"));
 });
 $(document).on("click", "#open-add-row-dialog-button", function() {
+    // Smoothness has reset the form to its defaults, such as port 22 and a custom account
     $("#row-form").removeClass("editing");
     jlab.setNewApp(false);
     jlab.setCopySource(null);
+    jlab.syncRequestPreset();
 });
 $(document).on("click", "#open-edit-row-dialog-button", function() {
     // An edit moves the record to another existing app; Apps edits an app itself
