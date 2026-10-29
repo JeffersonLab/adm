@@ -14,9 +14,29 @@
     </jsp:attribute>
     <jsp:body>
         <section>
+            <s:filter-flyout-widget clearButton="true">
             <form id="apps-form" class="filter-form" method="get" action="apps">
+                <div class="filter-form-panel">
+                    <fieldset>
+                        <legend>Filter</legend>
+                        <ul class="key-value-list">
+                            <li>
+                                <div class="li-key">
+                                    <label for="app-name">Name</label>
+                                </div>
+                                <div class="li-value">
+                                    <input id="app-name"
+                                           name="appName" value="${fn:escapeXml(param.appName)}"/>
+                                    <div>(use * as wildcard)</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </fieldset>
+                </div>
                 <input type="hidden" class="offset-input" name="offset" value="0"/>
+                <input class="filter-form-submit-button" type="submit" value="Apply"/>
             </form>
+            </s:filter-flyout-widget>
             <h2 id="page-header-title"><c:out value="${title}"/></h2>
             <div class="message-box"><c:out value="${selectionMessage}"/></div>
             <c:set var="readonly" value="${!pageContext.request.isUserInRole('adm-admin')}"/>

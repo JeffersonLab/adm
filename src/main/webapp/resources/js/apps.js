@@ -159,6 +159,7 @@ $(document).on("click", "#remove-row-button", function() {
     }
 });
 $(document).on("click", ".default-clear-panel", function () {
+    $("#app-name").val('');
     return false;
 });
 $(function(){
