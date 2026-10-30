@@ -184,9 +184,10 @@ gradlew integrationTest
 They wait up to 5 minutes for the services to start (set `ADM_READY_TIMEOUT_SECONDS` to change that), then log in with the demo users and the `adm` client's service account, as CI deploys do.  They add their own app envs to deploy to, and remove them afterwards.  They use the same [ports](#ports) as Compose, including those in `.env`.  To test an app elsewhere, set `ADM_URL` (default `https://localhost:8443/adm`) and `KEYCLOAK_URL` (default `http://localhost:8081/auth`).
 
 ## Release
-1. Bump the version number in the VERSION file and commit and push to GitHub (using [Semantic Versioning](https://semver.org/)).
-2. The [CD](https://github.com/JeffersonLab/adm/blob/main/.github/workflows/cd.yaml) GitHub Action should run automatically invoking:
-    - The [Create release](https://github.com/JeffersonLab/java-workflows/blob/main/.github/workflows/gh-release.yaml) GitHub Action to tag the source and create release notes summarizing any pull requests.   Edit the release notes to add any missing details.  A war file artifact is attached to the release.
+1. Bump the version number in the VERSION file (using [Semantic Versioning](https://semver.org/)) in a pull request.  Give its description a `## Release notes` section, with `### Highlights` and any `### Upgrade steps` such as database changes, and put checks and attribution under later `##` headings so they aren't published.  See [Release notes from a pull request](https://github.com/JeffersonLab/java-workflows#release-notes-from-a-pull-request).
+2. Merge the pull request.
+3. The [CD](https://github.com/JeffersonLab/adm/blob/main/.github/workflows/cd.yaml) GitHub Action should run automatically invoking:
+    - The [Create release](https://github.com/JeffersonLab/java-workflows/blob/main/.github/workflows/gh-release.yaml) GitHub Action to tag the source and create release notes: the merged pull request's Release notes section, followed by GitHub's generated summary of the pull requests.  A war file artifact is attached to the release.
     - The [Publish docker image](https://github.com/JeffersonLab/container-workflows/blob/main/.github/workflows/docker-publish.yaml) GitHub Action to create a new demo Docker image.
     - The [Deploy to JLab](https://github.com/JeffersonLab/general-workflows/blob/main/.github/workflows/jlab-deploy-app.yaml) GitHub Action to deploy to the JLab test environment.
 
