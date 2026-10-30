@@ -93,6 +93,9 @@ file of each remote user account needed for deployments.   It's also possible to
 ### Database
 The application requires an Oracle 19+ database with the following [schema](https://github.com/JeffersonLab/adm/tree/main/container/oracle/initdb.d) installed.   The application server hosting the app must also be configured with a JNDI datasource.
 
+### Deploying to several hosts
+An app env's Deploy Hostname can list several hosts, separated by commas, such as `epicsweb1, epicsweb2, epicsweb3` for an app that runs on each.  A deploy then runs the Deploy Command as the Deploy Username on each host in turn, in the order listed, with the same port, and stops at the first host where it fails, so a version that fails on one host doesn't reach the rest.  It is one deploy job, which succeeds only if the command succeeded on every host.
+
 ### Request Username presets
 The Deployment Allowlist's Add and Edit dialog offers the CI service accounts that request deploys as presets, so admins needn't type them.  Each preset is a setting with that account's username, which admins can change on the Settings page:
 
@@ -122,8 +125,9 @@ A refused deploy returns its reason, with HTTP status 200: `{"exception": "..."}
  "start": "2026-10-05T14:12:55-04:00", "end": "2026-10-05T14:12:56-04:00",
  "exitCode": 0, "out": "1.2.3\n", "err": null, "error": null}
 ```
-- `end` and `exitCode` are null while the job runs; poll until `end` is set.  A deploy command is stopped after 10 minutes.  The deploy succeeded if `exitCode` is 0.
+- `end` and `exitCode` are null while the job runs; poll until `end` is set.  A deploy command is stopped after 10 minutes; for an env with [several hosts](#deploying-to-several-hosts), the 10 minutes are for all of them together.  The deploy succeeded if `exitCode` is 0.
 - `out` and `err` are the deploy command's standard output and standard error.  `error` says why the command could not run or finish, such as an unknown host or a timeout.  Each is cut to its last 64 KiB, and is null when empty.
+- For an env with several hosts, `exitCode` is the last host's to run, and `error` names the host that failed and those not deployed to.  Each host's part of `out` starts with a line naming it, such as `== epicsweb1 ==`, and so does its part of `err` if it has one.
 - A missing or invalid ID returns HTTP status 400, a caller who may not see the job 403, and an unknown job 404, each with the reason: `{"exception": "..."}`.
 
 For example, to wait for a job, for a little longer than a deploy command may run, with a new token for each poll, and fail unless it succeeded:

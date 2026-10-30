@@ -20,6 +20,7 @@ class JobIT {
   private static String slowEnv;
   private static String longEnv;
   private static String badHostEnv;
+  private static String severalHostsEnv;
 
   @BeforeAll
   static void addAppEnvs() throws Exception {
@@ -31,11 +32,12 @@ class JobIT {
     longEnv =
         Adm.addAppEnv(Adm.SERVICE_ACCOUNT, "sshd", "sh -c 'yes a | head -c 70000; echo end' #");
     badHostEnv = Adm.addAppEnv(Adm.SERVICE_ACCOUNT, "nosuchhost", "echo");
+    severalHostsEnv = Adm.addAppEnv(Adm.SERVICE_ACCOUNT, "sshd, nosuchhost, sshd-unused", "echo");
   }
 
   @AfterAll
   static void removeAppEnvs() throws Exception {
-    for (String env : new String[] {failEnv, slowEnv, longEnv, badHostEnv}) {
+    for (String env : new String[] {failEnv, slowEnv, longEnv, badHostEnv, severalHostsEnv}) {
       if (env != null) {
         Adm.removeAppEnv(env);
       }
@@ -98,6 +100,23 @@ class JobIT {
 
     assertTrue(status.isNull("exitCode"), status.toString());
     assertTrue(status.getString("error").contains("nosuchhost"), status.getString("error"));
+  }
+
+  @Test
+  void severalHostsStopAtFirstFailure() throws Exception {
+    String token = Adm.serviceAccountToken();
+
+    JsonObject status = Adm.awaitJobStatus(Adm.startDeploy(token, severalHostsEnv, "1.0.0"), token);
+
+    // Not sshd's 0, as the deploy didn't succeed on every host
+    assertTrue(status.isNull("exitCode"), status.toString());
+    assertEquals("== sshd ==\n1.0.0\n== nosuchhost ==\n", status.getString("out"));
+    assertTrue(
+        status
+            .getString("error")
+            .startsWith(
+                "java.io.IOException: Deploy to nosuchhost failed; not deployed to sshd-unused"),
+        status.getString("error"));
   }
 
   @Test

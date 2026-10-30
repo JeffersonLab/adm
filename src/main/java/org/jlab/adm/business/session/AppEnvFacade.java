@@ -10,7 +10,10 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import org.jlab.adm.persistence.entity.App;
 import org.jlab.adm.persistence.entity.AppEnv;
 import org.jlab.smoothness.business.exception.UserFriendlyException;
@@ -120,7 +123,7 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
             envName,
             requestUsername,
             deployUsername,
-            deployHostname,
+            joinHostnames(deployHostname),
             deployPort,
             deployCommand);
 
@@ -165,7 +168,7 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
     env.setApp(app);
     env.setRequestServiceUsername(requestUsername);
     env.setRunServiceUsername(deployUsername);
-    env.setHostname(deployHostname);
+    env.setHostname(joinHostnames(deployHostname));
     env.setPort(deployPort);
     env.setDeployCommand(deployCommand);
 
@@ -187,6 +190,7 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
     requireNonBlank("Request Username", requestUsername);
     requireNonBlank("Deploy Username", deployUsername);
     requireNonBlank("Deploy Hostname", deployHostname);
+    validateHostnames(deployHostname);
 
     if (deployPort == null || deployPort < 1 || deployPort > 65535) {
       throw new UserFriendlyException(
@@ -194,6 +198,35 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
     }
 
     requireNonBlank("Deploy Command", deployCommand);
+  }
+
+  /** Refuses a host listed twice, which would deploy to it twice, or a list too long to save. */
+  private static void validateHostnames(String deployHostname) throws UserFriendlyException {
+    List<String> hosts = AppEnv.parseHostnames(deployHostname);
+
+    // Such as only commas
+    if (hosts.isEmpty()) {
+      throw new UserFriendlyException("Deploy Hostname cannot be empty");
+    }
+
+    Set<String> seen = new HashSet<>();
+
+    for (String host : hosts) {
+      // Host names are case-insensitive
+      if (!seen.add(host.toLowerCase(Locale.ROOT))) {
+        throw new UserFriendlyException("Deploy Hostname lists " + host + " more than once");
+      }
+    }
+
+    if (joinHostnames(deployHostname).length() > AppEnv.MAX_HOSTNAME_LENGTH) {
+      throw new UserFriendlyException(
+          "Deploy Hostname cannot be longer than " + AppEnv.MAX_HOSTNAME_LENGTH + " characters");
+    }
+  }
+
+  /** Saves a list of hosts in one form, whichever separators were typed: "host1, host2" */
+  static String joinHostnames(String deployHostname) {
+    return String.join(", ", AppEnv.parseHostnames(deployHostname));
   }
 
   private static void requireNonBlank(String field, String value) throws UserFriendlyException {
@@ -272,8 +305,15 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
     }
 
     if (hostname != null && !hostname.isEmpty()) {
-      hostname = hostname.replaceAll("\\*", "%");
-      filters.add(cb.like(cb.lower(root.get("hostname")), hostname.toLowerCase()));
+      hostname = hostname.replaceAll("\\*", "%").toLowerCase();
+      Expression<String> hosts = cb.lower(root.get("hostname"));
+      // Any of the env's hosts, which are saved as "host1, host2"
+      filters.add(
+          cb.or(
+              cb.like(hosts, hostname),
+              cb.like(hosts, hostname + ", %"),
+              cb.like(hosts, "%, " + hostname),
+              cb.like(hosts, "%, " + hostname + ", %")));
     }
 
     return filters;

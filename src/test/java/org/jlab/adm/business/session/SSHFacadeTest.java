@@ -14,7 +14,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.time.Duration;
 import org.apache.sshd.client.SshClient;
-import org.apache.sshd.client.config.hosts.HostConfigEntryResolver;
+import org.apache.sshd.client.config.hosts.HostConfigEntry;
 import org.apache.sshd.client.keyverifier.AcceptAllServerKeyVerifier;
 import org.apache.sshd.common.config.keys.KeyUtils;
 import org.apache.sshd.common.keyprovider.KeyIdentityProvider;
@@ -117,14 +117,81 @@ class SSHFacadeTest {
     assertNotNull(job.getStackTrace());
   }
 
+  @Test
+  void deploysToEachHostInTurn() throws Exception {
+    DeployJob job = run(facade(), USERNAME, "web1, web2", "echo deploying myapp");
+
+    assertEquals(0, job.getExitCode());
+    assertEquals(
+        "== web1 ==\ndeploying myapp 1.2.3\n== web2 ==\ndeploying myapp 1.2.3\n", job.getOut());
+    // Headed only where a host wrote to it
+    assertEquals("", job.getErr());
+    assertNull(job.getStackTrace());
+  }
+
+  @Test
+  void headerStartsOnItsOwnLine() throws Exception {
+    DeployJob job = run(facade(), USERNAME, "web1, web2", "printf deployed");
+
+    assertEquals(0, job.getExitCode());
+    assertEquals("== web1 ==\ndeployed 1.2.3\n== web2 ==\ndeployed 1.2.3", job.getOut());
+  }
+
+  @Test
+  void stopsAtFirstHostThatFails() throws Exception {
+    DeployJob job = run(facade(), USERNAME, "web1, web2", "fail");
+
+    assertEquals(3, job.getExitCode());
+    assertEquals("== web1 ==\nout\n", job.getOut());
+    assertEquals("== web1 ==\nerr\n", job.getErr());
+    assertNull(job.getStackTrace());
+  }
+
+  @Test
+  void stopsAtHostThatCannotBeReached() throws Exception {
+    DeployJob job = run(facade(), USERNAME, "web1, nosuchhost.invalid, web3", "echo");
+
+    // Not web1's 0, which would report success
+    assertNull(job.getExitCode());
+    assertEquals("== web1 ==\n1.2.3\n== nosuchhost.invalid ==\n", job.getOut());
+    assertTrue(
+        job.getStackTrace()
+            .startsWith(
+                "java.io.IOException: Deploy to nosuchhost.invalid failed; not deployed to web3"),
+        job.getStackTrace());
+  }
+
+  @Test
+  void hostsShareOneTimeout() throws Exception {
+    SSHFacade facade = facade();
+    facade.commandTimeout = Duration.ofMillis(2500);
+
+    // web1 takes 1.5 of the 2.5 seconds, which leaves web2 too little
+    DeployJob job = run(facade, USERNAME, "web1, web2", "slow");
+
+    assertNull(job.getExitCode());
+    assertEquals("== web1 ==\ndone\n== web2 ==\n", job.getOut());
+    assertTrue(
+        job.getStackTrace().startsWith("java.io.IOException: Deploy to web2 failed\n"),
+        job.getStackTrace());
+    assertTrue(
+        job.getStackTrace().contains("Caused by: java.net.SocketTimeoutException"),
+        job.getStackTrace());
+  }
+
   private DeployJob run(SSHFacade facade, String username, String deployCommand) throws Exception {
+    return run(facade, username, "localhost", deployCommand);
+  }
+
+  private DeployJob run(SSHFacade facade, String username, String hostnames, String deployCommand)
+      throws Exception {
     AppEnv env =
         new AppEnv(
             new App("testapp", null),
             "test",
             "deployer-service",
             username,
-            "localhost",
+            hostnames,
             server.getPort(),
             deployCommand);
     DeployJob job = new DeployJob(env, "1.2.3");
@@ -146,7 +213,14 @@ class SSHFacadeTest {
             SshClient client = SshClient.setUpDefaultClient();
             client.setKeyIdentityProvider(KeyIdentityProvider.wrapKeyPairs(clientKey));
             client.setServerKeyVerifier(AcceptAllServerKeyVerifier.INSTANCE);
-            client.setHostConfigEntryResolver(HostConfigEntryResolver.EMPTY);
+            // Hosts named web1, web2... are this server, as a Host entry in ~/.ssh/config would
+            // make
+            // them, so one server can stand in for several hosts
+            client.setHostConfigEntryResolver(
+                (host, port, localAddress, username, proxyJump, context) ->
+                    host.startsWith("web")
+                        ? new HostConfigEntry(host, "localhost", port, username)
+                        : null);
             return client;
           }
         };
@@ -217,6 +291,11 @@ class SSHFacadeTest {
             write(out, words.length > 1 ? words[1] + "\n" : "\n");
             exitCallback.onExit(0);
           }
+          case "printf" -> {
+            // No newline at the end
+            write(out, words.length > 1 ? words[1] : "");
+            exitCallback.onExit(0);
+          }
           case "fail" -> {
             write(out, "out\n");
             write(err, "err\n");
@@ -230,6 +309,11 @@ class SSHFacadeTest {
             } else {
               exitCallback.onExit(0);
             }
+          }
+          case "slow" -> {
+            Thread.sleep(1500);
+            write(out, "done\n");
+            exitCallback.onExit(0);
           }
           case "hang" -> {
             write(out, "partial\n");
