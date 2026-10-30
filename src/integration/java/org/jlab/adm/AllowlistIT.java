@@ -25,7 +25,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Adding a deployment allowlist record (app env), with its app chosen or created (issue #36), or
- * copied from an existing record (issue #38), and the dialog's defaults and checks (issue #37).
+ * copied from an existing record (issue #38), the dialog's defaults and checks (issue #37), and
+ * several hosts (issue #7).
  */
 class AllowlistIT {
 
@@ -234,6 +235,55 @@ class AllowlistIT {
 
     assertEquals("fail", result.getString("stat"));
     assertEquals("Unable to add App: Request Username cannot be empty", result.getString("error"));
+  }
+
+  /** Several hosts are saved as "host1, host2" (issue #7), however they were separated. */
+  @Test
+  void severalHostnamesAreSavedInOneForm() throws Exception {
+    // Longer together than one host name's 128 characters
+    String host1 = "a".repeat(100) + ".example.com";
+    String host2 = "b".repeat(100) + ".example.com";
+    String env = "it-hosts-" + UUID.randomUUID().toString().substring(0, 8);
+
+    Map<String, String> form = new LinkedHashMap<>();
+    form.put("appName", Adm.APP);
+    form.put("newApp", "N");
+    form.put("envName", env);
+    form.put("requestUsername", Adm.SERVICE_ACCOUNT);
+    form.put("deployUsername", "testuser");
+    form.put("deployHostname", " " + host1 + ",\n" + host2 + " ");
+    form.put("deployPort", "22");
+    form.put("deployCommand", "echo");
+
+    JsonObject result = Adm.json(Adm.post("/inventory/ajax/add-app-env", Adm.adminToken(), form));
+    try {
+      assertEquals("ok", result.getString("stat"), result.toString());
+
+      String page = allowlistPage(Adm.adminToken(), env);
+      assertEquals(host1 + ", " + host2, rowData(row(page)).get("deploy-hostname"));
+      // One host per line in the table
+      assertTrue(page.contains("<div>" + host1 + ":22</div>"), page);
+      assertTrue(page.contains("<div>" + host2 + ":22</div>"), page);
+
+      // The hostname filter finds the env by any of its hosts
+      HttpResponse<String> filtered =
+          Adm.get(
+              "/inventory/app-envs?appName=" + Adm.APP + "&hostname=" + host2, Adm.adminToken());
+      assertTrue(filtered.body().contains("data-env-name=\"" + env + "\""), filtered.body());
+    } finally {
+      if ("ok".equals(result.getString("stat"))) {
+        Adm.removeAppEnv(env);
+      }
+    }
+  }
+
+  @Test
+  void hostnameListedTwiceIsRefused() throws Exception {
+    JsonObject result = addAppEnvWith("deployHostname", "sshd, SSHD");
+
+    assertEquals("fail", result.getString("stat"));
+    assertEquals(
+        "Unable to add App: Deploy Hostname lists SSHD more than once", result.getString("error"));
   }
 
   /** The port is checked before the record is looked up, so the demo record isn't changed. */

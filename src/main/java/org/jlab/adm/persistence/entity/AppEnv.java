@@ -5,12 +5,17 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
 @Table(schema = "ADM_OWNER", name = "APP_ENV")
 public class AppEnv implements Serializable {
   private static final long serialVersionUID = 1L;
+
+  /** The HOSTNAME column's length, which holds all of an env's hosts */
+  public static final int MAX_HOSTNAME_LENGTH = 1024;
 
   @Id
   @SequenceGenerator(name = "AppEnvId", sequenceName = "APP_ENV_ID", allocationSize = 1)
@@ -43,10 +48,11 @@ public class AppEnv implements Serializable {
   @Column(name = "RUN_SERVICE_USERNAME", nullable = false, length = 128)
   private String runServiceUsername;
 
+  // One or more hosts, separated by commas or spaces; the deploy command runs on each in turn
   @Basic(optional = false)
   @NotNull
-  @Size(min = 1, max = 128)
-  @Column(nullable = false, length = 128)
+  @Size(min = 1, max = MAX_HOSTNAME_LENGTH)
+  @Column(nullable = false, length = MAX_HOSTNAME_LENGTH)
   private String hostname;
 
   @Basic(optional = false)
@@ -125,6 +131,20 @@ public class AppEnv implements Serializable {
 
   public void setHostname(String hostname) {
     this.hostname = hostname;
+  }
+
+  /** The hosts to deploy to, in order */
+  public List<String> getHostnames() {
+    return parseHostnames(hostname);
+  }
+
+  /** Splits a list of hosts separated by commas or whitespace, neither of which a host name has */
+  public static List<String> parseHostnames(String hostnames) {
+    if (hostnames == null) {
+      return List.of();
+    }
+
+    return Arrays.stream(hostnames.split("[,\\s]+")).filter(h -> !h.isEmpty()).toList();
   }
 
   public int getPort() {

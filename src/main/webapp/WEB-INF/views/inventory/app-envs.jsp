@@ -59,7 +59,7 @@
             </s:filter-flyout-widget>
             <h2 class="page-header-title"><c:out value="${title}"/></h2>
             <p class="page-description">Each record allows its Request Username to deploy an App to an Env:
-                ADM runs the Deploy Command as the Deploy Username on the Deploy Hostname.
+                ADM runs the Deploy Command as the Deploy Username on each Deploy Hostname.
                 <a href="${pageContext.request.contextPath}/inventory/apps">Apps</a> hold what an app's envs share,
                 such as its documentation URL.</p>
             <div class="message-box"><c:out value="${selectionMessage}"/></div>
@@ -104,7 +104,9 @@
                                 <c:out value="${appenv.runServiceUsername}"/>
                             </td>
                             <td>
-                                <c:out value="${appenv.hostname}"/>:<c:out value="${appenv.port}"/>
+                                <c:forEach items="${appenv.hostnames}" var="host">
+                                    <div><c:out value="${host}"/>:<c:out value="${appenv.port}"/></div>
+                                </c:forEach>
                             </td>
                             <td>
                                 <c:out value="${appenv.deployCommand}"/>
@@ -202,7 +204,9 @@
                                 <label for="row-deploy-hostname">Deploy Hostname</label>
                             </div>
                             <div class="li-value">
-                                <input type="text" id="row-deploy-hostname"/>
+                                <input type="text" id="row-deploy-hostname" placeholder="host1, host2"/>
+                                <div class="field-hint">One or more hosts, separated by commas.
+                                    ADM runs the Deploy Command on each in turn, and stops at the first that fails</div>
                             </div>
                         </li>
                         <li>
