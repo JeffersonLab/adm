@@ -63,7 +63,10 @@
                 <a href="${pageContext.request.contextPath}/inventory/apps">Apps</a> hold what an app's envs share,
                 such as its documentation URL.</p>
             <div class="message-box"><c:out value="${selectionMessage}"/></div>
-            <c:set var="readonly" value="${!pageContext.request.isUserInRole('adm-admin')}"/>
+            <c:set var="readonly" value="${!pageContext.request.isUserInRole('adm-admin') or not empty editRefusal}"/>
+            <c:if test="${not empty editRefusal}">
+                <div id="edit-refusal" class="notice">Read-only: <c:out value="${editRefusal}"/>.</div>
+            </c:if>
             <c:if test="${not readonly}">
                 <s:editable-row-table-controls>
                     <button type="button" id="open-copy-row-dialog-button" class="selected-row-action" disabled="disabled">Copy Existing</button>

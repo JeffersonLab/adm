@@ -11,6 +11,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import org.jlab.adm.business.session.AppEnvFacade;
+import org.jlab.adm.business.util.EditNetworkPolicy;
 import org.jlab.adm.persistence.entity.AppEnv;
 import org.jlab.smoothness.presentation.util.Paginator;
 import org.jlab.smoothness.presentation.util.ParamConverter;
@@ -47,6 +48,12 @@ public class AppEnvs extends HttpServlet {
     request.setAttribute("paginator", paginator);
     request.setAttribute("selectionMessage", selectionMessage);
     request.setAttribute("appenvList", appenvList);
+
+    // Admins outside the edit networks get the read-only page, and are told why
+    if (request.isUserInRole("adm-admin")) {
+      request.setAttribute(
+          "editRefusal", EditNetworkPolicy.configured().refusal(EditNetworkPolicy.clientAddress()));
+    }
 
     request
         .getRequestDispatcher("/WEB-INF/views/inventory/app-envs.jsp")

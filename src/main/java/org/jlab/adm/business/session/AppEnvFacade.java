@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import org.jlab.adm.business.util.EditNetworkPolicy;
 import org.jlab.adm.persistence.entity.App;
 import org.jlab.adm.persistence.entity.AppEnv;
 import org.jlab.smoothness.business.exception.UserFriendlyException;
@@ -64,6 +65,8 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
 
   @RolesAllowed("adm-admin")
   public void removeAppEnv(BigInteger appEnvId) throws UserFriendlyException {
+    EditNetworkPolicy.configured().checkCurrentRequest();
+
     if (appEnvId == null) {
       throw new UserFriendlyException("appEnvId cannot be empty");
     }
@@ -96,6 +99,8 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
       Integer deployPort,
       String deployCommand)
       throws UserFriendlyException {
+    EditNetworkPolicy.configured().checkCurrentRequest();
+
     validate(
         appName,
         envName,
@@ -141,6 +146,8 @@ public class AppEnvFacade extends AbstractFacade<AppEnv> {
       Integer deployPort,
       String deployCommand)
       throws UserFriendlyException {
+    EditNetworkPolicy.configured().checkCurrentRequest();
+
     validate(
         appName,
         envName,
