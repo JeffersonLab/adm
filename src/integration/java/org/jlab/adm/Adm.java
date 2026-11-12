@@ -59,7 +59,7 @@ final class Adm {
   /** The adm client's service account, which deploys like CI does */
   static final String SERVICE_ACCOUNT = "service-account-adm";
 
-  private static final String CLIENT_ID = "adm";
+  static final String CLIENT_ID = "adm";
   private static final String CLIENT_SECRET = "yHi6W2raPmLvPXoxqMA7VWbLAA2WN0eB";
   private static final String TOKEN_URL =
       KEYCLOAK_URL + "/realms/test-realm/protocol/openid-connect/token";
@@ -68,7 +68,8 @@ final class Adm {
       Duration.ofSeconds(Long.parseLong(env("ADM_READY_TIMEOUT_SECONDS", "300")));
   private static final Duration JOB_TIMEOUT = Duration.ofSeconds(60);
 
-  private static final HttpClient HTTP =
+  /** Trusts the demo certificate; follows no redirects and keeps no cookies */
+  static final HttpClient HTTP =
       HttpClient.newBuilder()
           .sslContext(sslContext())
           .connectTimeout(Duration.ofSeconds(5))
@@ -118,9 +119,15 @@ final class Adm {
   }
 
   private static String token(Map<String, String> form) throws IOException, InterruptedException {
+    return token(CLIENT_ID, CLIENT_SECRET, form);
+  }
+
+  /** Gets a token that Keycloak issues to this client of the realm. */
+  static String token(String clientId, String clientSecret, Map<String, String> form)
+      throws IOException, InterruptedException {
     String basic =
         Base64.getEncoder()
-            .encodeToString((CLIENT_ID + ":" + CLIENT_SECRET).getBytes(StandardCharsets.UTF_8));
+            .encodeToString((clientId + ":" + clientSecret).getBytes(StandardCharsets.UTF_8));
 
     HttpRequest request =
         HttpRequest.newBuilder(URI.create(TOKEN_URL))

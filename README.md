@@ -90,6 +90,19 @@ connections can be made non-interactively (programmatically) without password pr
 public and private key pair for the Wildfly user via `ssh-keygen` and then add the public key to the `authorized_keys` 
 file of each remote user account needed for deployments.   It's also possible to use Kerberos and keytabs instead.
 
+### Token audience
+In a Keycloak realm shared with other applications, Keycloak issues tokens to each of them for the same users, with the same realm roles.  So that the app takes only the bearer tokens meant for it, turn on the audience check for `adm.war` in Wildfly, as the [Dockerfile](https://github.com/JeffersonLab/adm/blob/main/Dockerfile) does:
+```
+/subsystem=elytron-oidc-client/secure-deployment=adm.war:write-attribute(name=verify-token-audience,value=true)
+```
+The app then refuses a bearer token (HTTP status 401) unless its `aud` claim names the app's client.  Keycloak does not name a client in the tokens it issues to that client itself, so first give the app's client, and any other client that requests deploys, such as CI's, an audience mapper: in the admin console, the client's dedicated scope > Add mapper > Audience, with the app's client as the Included Client Audience and Add to access token on.  With `kcadm.sh`, as the demo's [Keycloak setup](https://github.com/JeffersonLab/adm/blob/main/container/keycloak/initdb.d/03_customize.sh) does:
+```
+kcadm.sh create clients/<client's ID>/protocol-mappers/models -r <realm> -s name=adm-audience -s protocol=openid-connect \
+  -s protocolMapper=oidc-audience-mapper -s 'config."included.client.audience"=adm' \
+  -s 'config."access.token.claim"=true' -s 'config."id.token.claim"=false'
+```
+Add the mappers first and check that a new token's `aud` includes `adm`, then turn the check on and reload Wildfly: in the other order, deploy requests fail until the mappers exist.  Logging in with a browser is not affected either way.
+
 ### Limiting inventory edits to a network
 Changing the inventory (the Deployment Allowlist and Apps) needs the `adm-admin` role.  To also require that the admin connects from certain networks, such as the site's own, set the environment variable `ADM_INVENTORY_EDIT_NETWORKS` to a list of addresses or CIDR blocks, separated by commas or spaces:
 ```
