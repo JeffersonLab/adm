@@ -22,8 +22,12 @@ ARG SSHD_VER
 COPY --from=builder /app/container/app/app-setup.env /
 COPY --from=builder /app/container/app/pre-entrypoint.sh /
 USER root
+# verify-token-audience: take only the bearer tokens issued for this app (aud names its client), not
+# those the realm issues to its other clients.  Keycloak needs an audience mapper for it (README)
 RUN /server-setup.sh /app-setup.env wildfly_start_and_wait \
      && /app-setup.sh /app-setup.env config_keycloak_client \
+     && /opt/wildfly/current/bin/jboss-cli.sh -c \
+          '/subsystem=elytron-oidc-client/secure-deployment=adm.war:write-attribute(name=verify-token-audience,value=true)' \
      && /app-setup.sh /app-setup.env config_oracle_client \
      && /server-setup.sh /app-setup.env config_email \
      && /server-setup.sh /app-setup.env wildfly_reload \
