@@ -10,6 +10,7 @@ import jakarta.persistence.criteria.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import org.jlab.adm.business.util.EditNetworkPolicy;
 import org.jlab.adm.persistence.entity.App;
 import org.jlab.smoothness.business.exception.UserFriendlyException;
 
@@ -29,6 +30,8 @@ public class AppFacade extends AbstractFacade<App> {
 
   @RolesAllowed("adm-admin")
   public App addApp(String name, String docUrl) throws UserFriendlyException {
+    EditNetworkPolicy.configured().checkCurrentRequest();
+
     if (name == null || name.isEmpty()) {
       throw new UserFriendlyException("Name cannot be empty");
     }
@@ -49,6 +52,7 @@ public class AppFacade extends AbstractFacade<App> {
 
   @RolesAllowed({"adm-admin"})
   public void editApp(BigInteger appId, String name, String docUrl) throws UserFriendlyException {
+    EditNetworkPolicy.configured().checkCurrentRequest();
 
     if (appId == null) {
       throw new UserFriendlyException("appId cannot be empty");
@@ -68,6 +72,8 @@ public class AppFacade extends AbstractFacade<App> {
 
   @RolesAllowed("adm-admin")
   public void removeSoftware(BigInteger appId) throws UserFriendlyException {
+    EditNetworkPolicy.configured().checkCurrentRequest();
+
     if (appId == null) {
       throw new UserFriendlyException("appId cannot be empty");
     }

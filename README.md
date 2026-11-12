@@ -90,6 +90,15 @@ connections can be made non-interactively (programmatically) without password pr
 public and private key pair for the Wildfly user via `ssh-keygen` and then add the public key to the `authorized_keys` 
 file of each remote user account needed for deployments.   It's also possible to use Kerberos and keytabs instead.
 
+### Limiting inventory edits to a network
+Changing the inventory (the Deployment Allowlist and Apps) needs the `adm-admin` role.  To also require that the admin connects from certain networks, such as the site's own, set the environment variable `ADM_INVENTORY_EDIT_NETWORKS` to a list of addresses or CIDR blocks, separated by commas or spaces:
+```
+ADM_INVENTORY_EDIT_NETWORKS=192.0.2.0/24, 2001:db8::/32
+```
+An admin connecting from elsewhere then gets the same read-only pages as other users, with a note that says why, and a refused edit returns that reason.  Each request is checked, so an admin who logged in from one of the networks loses the ability on moving out of them.  Deploys, and everything else, are not limited.  Unset or blank, the default, admins edit from anywhere.  An entry that isn't an address or a block is ignored, with an error in the server log; if none is valid, no one can edit.  It is an environment variable and not a setting so that an admin outside the networks cannot change it on the Settings page.
+
+The app takes the client's address from the first entry of the `X-Forwarded-For` header, or from the connection if there is none.  Behind a reverse proxy, the proxy must replace that header with the address it sees, not add to the one a client sent, and the app server must accept requests only from the proxy; otherwise a client can claim any address.  In HAProxy, for example, `http-request set-header X-Forwarded-For %[src]` replaces it, where `option forwardfor` only adds to it.  The demo sets the variable to the private networks the host connects from.
+
 ### Database
 The application requires an Oracle 19+ database with the following [schema](https://github.com/JeffersonLab/adm/tree/main/container/oracle/initdb.d) installed.   The application server hosting the app must also be configured with a JNDI datasource.
 

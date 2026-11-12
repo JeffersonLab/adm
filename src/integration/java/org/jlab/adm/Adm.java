@@ -284,10 +284,23 @@ final class Adm {
 
   static HttpResponse<String> get(String path, String token)
       throws IOException, InterruptedException {
+    return get(path, token, null);
+  }
+
+  /**
+   * @param clientAddress the address the app should take the request to come from, or null for the
+   *     test's own; the app believes X-Forwarded-For here, as no proxy replaces it
+   */
+  static HttpResponse<String> get(String path, String token, String clientAddress)
+      throws IOException, InterruptedException {
     HttpRequest.Builder builder = HttpRequest.newBuilder(URI.create(ADM_URL + path));
 
     if (token != null) {
       builder.header("Authorization", "Bearer " + token);
+    }
+
+    if (clientAddress != null) {
+      builder.header("X-Forwarded-For", clientAddress);
     }
 
     return HTTP.send(builder.GET().build(), HttpResponse.BodyHandlers.ofString());
@@ -295,12 +308,25 @@ final class Adm {
 
   static HttpResponse<String> post(String path, String token, Map<String, String> form)
       throws IOException, InterruptedException {
+    return post(path, token, form, null);
+  }
+
+  /**
+   * @param clientAddress as for get
+   */
+  static HttpResponse<String> post(
+      String path, String token, Map<String, String> form, String clientAddress)
+      throws IOException, InterruptedException {
     HttpRequest.Builder builder =
         HttpRequest.newBuilder(URI.create(ADM_URL + path))
             .header("Content-Type", "application/x-www-form-urlencoded");
 
     if (token != null) {
       builder.header("Authorization", "Bearer " + token);
+    }
+
+    if (clientAddress != null) {
+      builder.header("X-Forwarded-For", clientAddress);
     }
 
     return HTTP.send(

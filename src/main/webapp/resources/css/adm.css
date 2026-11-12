@@ -16,3 +16,11 @@
 .max-select {
     float: right;
 }
+/* Why an admin can't edit this page */
+.notice {
+    max-width: 60em;
+    margin: 0.5em 0;
+    padding: 0.5em;
+    border-left: 4px solid #c9a227;
+    background-color: #fdf6dc;
+}

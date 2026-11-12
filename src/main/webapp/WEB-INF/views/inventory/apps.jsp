@@ -39,7 +39,10 @@
             </s:filter-flyout-widget>
             <h2 id="page-header-title"><c:out value="${title}"/></h2>
             <div class="message-box"><c:out value="${selectionMessage}"/></div>
-            <c:set var="readonly" value="${!pageContext.request.isUserInRole('adm-admin')}"/>
+            <c:set var="readonly" value="${!pageContext.request.isUserInRole('adm-admin') or not empty editRefusal}"/>
+            <c:if test="${not empty editRefusal}">
+                <div id="edit-refusal" class="notice">Read-only: <c:out value="${editRefusal}"/>.</div>
+            </c:if>
             <c:if test="${not readonly}">
                 <s:editable-row-table-controls>
                 </s:editable-row-table-controls>
