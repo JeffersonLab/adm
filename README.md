@@ -101,7 +101,7 @@ kcadm.sh create clients/<client's ID>/protocol-mappers/models -r <realm> -s name
   -s protocolMapper=oidc-audience-mapper -s 'config."included.client.audience"=adm' \
   -s 'config."access.token.claim"=true' -s 'config."id.token.claim"=false'
 ```
-Add the mappers first and check that a new token's `aud` includes `adm`, then turn the check on and reload Wildfly: in the other order, deploy requests fail until the mappers exist.  Logging in with a browser is not affected either way.
+Add the mappers first and check that a new token's `aud` includes `adm`, then turn the check on and redeploy `adm.war`: in the other order, deploy requests fail until the mappers exist.  The setting takes effect only when the war is next deployed, and Wildfly does not say that it is waiting.  Logging in with a browser is not affected either way.
 
 ### Limiting inventory edits to a network
 Changing the inventory (the Deployment Allowlist and Apps) needs the `adm-admin` role.  To also require that the admin connects from certain networks, such as the site's own, set the environment variable `ADM_INVENTORY_EDIT_NETWORKS` to a list of addresses or CIDR blocks, separated by commas or spaces:
