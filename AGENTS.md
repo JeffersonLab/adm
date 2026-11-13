@@ -42,6 +42,11 @@ project is, its settings, and how to set it up.
   (the demo `local-dev` env deploys to it), with the demo key pair in `compose.yaml`. Never
   give an app env a real host, and never point the app at JLab's servers or production
   databases.
+- User guide (`docs/user-guide`): it is also a Zensical website (`zensical.toml`, tools pinned by
+  `uv.lock`). On a change to it, run `uv run --locked zensical build --strict`, as CI's
+  `user-guide` job does; link within the guide by relative path, and outside it by full URL.
+  Releases publish it to GitHub Pages (`cd.yaml`). A change to behavior or pages that the guide
+  describes updates the guide in the same pull request.
 - UI changes: there are no browser tests or screenshot script; look at the page in a browser
   (forward the ports from the VM, or drive one) and say in the pull request what you checked.
 - Compile for Java 17 (`options.release = 17`). Wildfly provides the `providedCompile`
@@ -189,8 +194,8 @@ the pull request's required checks.
 
 ## Project rules
 
-- PR checks: `build` and `integration` from CI, and CodeQL. Wait for them before reporting a
-  pull request ready.
+- PR checks: `build`, `integration` and `user-guide` from CI, and CodeQL. Wait for them before
+  reporting a pull request ready.
 - Changelog eligibility: unused. Types: unused.
 - Breaking trailers: unused.
 - Milestones and issue status: unused.

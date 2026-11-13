@@ -21,6 +21,8 @@ A [Jakarta EE 10](https://en.wikipedia.org/wiki/Jakarta_EE) web application for 
 The automated deployment manager app aids programmatic app deployment by providing an HTTP endpoint for executing 
 curated remote deployment commands securely.
 
+See the [User Guide](https://github.com/JeffersonLab/adm/blob/main/docs/user-guide/README.md) for how to use it.
+
 ## Quick Start with Compose
 1. Grab project
 ```
@@ -180,6 +182,13 @@ gradlew build
 
 **Note for JLab On-Site Users**: Jefferson Lab has an intercepting [proxy](https://gist.github.com/slominskir/92c25a033db93a90184a5994e71d0b78)
 
+### User Guide website
+The [user guide](https://github.com/JeffersonLab/adm/tree/main/docs/user-guide) is Markdown, readable on GitHub, and also built into a website with [Zensical](https://zensical.org) ([zensical.toml](zensical.toml)). With [uv](https://docs.astral.sh/uv/getting-started/installation/) installed:
+```
+uv run --locked zensical build --strict
+```
+builds it into `site/`, as CI does; `--strict` fails on a link to a missing page or heading. `uv run --locked zensical serve` previews it at http://localhost:8000.
+
 ## Develop
 In order to iterate rapidly when making changes it's often useful to run the app directly on the local workstation, perhaps leveraging an IDE.  In this scenario run the service dependencies with:
 ```
@@ -212,6 +221,7 @@ They wait up to 5 minutes for the services to start (set `ADM_READY_TIMEOUT_SECO
     - The [Create release](https://github.com/JeffersonLab/java-workflows/blob/main/.github/workflows/gh-release.yaml) GitHub Action to tag the source and create release notes: the merged pull request's Release notes section, followed by GitHub's generated summary of the pull requests.  A war file artifact is attached to the release.
     - The [Publish docker image](https://github.com/JeffersonLab/container-workflows/blob/main/.github/workflows/docker-publish.yaml) GitHub Action to create a new demo Docker image.
     - The [Deploy to JLab](https://github.com/JeffersonLab/general-workflows/blob/main/.github/workflows/jlab-deploy-app.yaml) GitHub Action to deploy to the JLab test environment.
+    - A job that publishes the [User Guide](https://jeffersonlab.github.io/adm/) to GitHub Pages, in a folder for the release and in `latest/`.
 
 ## Deploy
 The deploy to JLab's acctest is handled automatically via the release workflow.
