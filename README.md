@@ -189,6 +189,8 @@ uv run --locked zensical build --strict
 ```
 builds it into `site/`, as CI does; `--strict` fails on a link to a missing page or heading. `uv run --locked zensical serve` previews it at http://localhost:8000.
 
+CI builds it and each release publishes it with the [user guide workflows](https://github.com/JeffersonLab/general-workflows/blob/main/docs/user-guide/README.md) of general-workflows.
+
 ## Develop
 In order to iterate rapidly when making changes it's often useful to run the app directly on the local workstation, perhaps leveraging an IDE.  In this scenario run the service dependencies with:
 ```
